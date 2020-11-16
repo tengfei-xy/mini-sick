@@ -18,13 +18,13 @@ var DB * sql.DB
 
 func main (){
 
-	pnt.Info("mini-sick Start!")
 
 	DB = initMySQL()
+	pnt.Init("mini-sick Start!")
 
 	http.HandleFunc("/", root)
 	http.HandleFunc("/mini-sick", index)
-	pnt.Info(http.ListenAndServeTLS("0.0.0.0:8080", "../ssl/mini.xunyang.site2.pem", "../ssl/mini.xunyang.site2.key", nil))
+	pnt.Info(http.ListenAndServeTLS("0.0.0.0:8080", "../ssl/mini.xunyang.site.pem", "../ssl/mini.xunyang.site.key", nil))
 
 }
 func index(w http.ResponseWriter, r *http.Request){

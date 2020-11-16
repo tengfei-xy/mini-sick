@@ -51,7 +51,7 @@ func (a * ans) set(s int,e,d string){
     a.Data = d
 
 }
-func getAns(status int,explain string,data string) ans{
+func getAns(status int,explain ,data string) ans{
     var a ans
     a.set(status,explain,data)
     return a
@@ -63,44 +63,52 @@ func getAns(status int,explain string,data string) ans{
 //
 //
 func (ui * userInfo) msgMain() []byte{
-    // var u user
-    // type user struct{
-    //     Name string
-    //     Password string
-    // }
+
     var    Name string
     var    Password string
-    pnt.Search("医生登录-姓名:%s,账号ID:%s,密码:%s\n",ui.Name,ui.Account,ui.Password)
-    err := DB.QueryRow("SELECT name,password FROM users WHERE account=?",ui.Account).Scan(&Name,&Password)
-    if err != nil{
-        pnt.Error(err)
-        return reParseJson(getAns(1,"登录错误！",""))
+    var    log = fmt.Sprintf("姓名:%s,账号ID:%s,密码:%s",ui.Name,ui.Account,ui.Password)
 
-    }
-    if Name=="" && ui.Name == ""{
-        return reParseJson(getAns(1,"第一次登录其先输入姓名信息！",""))
-    }
+    // 如果密码是空
+    if ui.Password == ""{ return reParseJson(getAns(1,"登录失败！","")) }
 
-    // if Name == ""{
-    //     _,err:= DB.Exec("update users SET name=? where account=?",ui.Name,ui.Account)
-    //     if err != nil{
-    //         pnt.Error(err)
-    //         return reParseJson(getAns(1,"登录失败！",""))
-    //     }
-    // }
+    // 账号登录方式
+    if ui.Account != "" {
+        err := DB.QueryRow("SELECT name,password FROM users WHERE account=?",ui.Account).Scan(&Name,&Password)
+        if err != nil{
+            pnt.Errorf("用户登录错误-err:%v-info:%s",err,log)
+            return reParseJson(getAns(1,"登录错误！",""))
+        }
+
+    // 姓名登录方式
+    }else if ui.Name!="" {
+
+        err := DB.QueryRow("SELECT password FROM users WHERE name=?",ui.Name).Scan(&Password)
+        if err != nil{
+            pnt.Errorf("用户登录错误-err:%v-info:%s",err,log)
+            return reParseJson(getAns(1,"登录错误！",""))
+        }
+    }
+    
+    // 输入密码 与 数据库查询密码 不匹配
     if ui.Password != Password{
+
+        pnt.Errorf("用户登录失败-err:%s-info:%s","密码或认证方式不匹配",log)
         return reParseJson(getAns(1,"登录失败！",""))
     }
+
+    pnt.Infof("用户登录成功-log:%s",log)
     return reParseJson(getAns(0,"登录成功！",Name))
     
 }
 //
 //
-// 更新 患者基本信息
+// 添加 患者基本信息
 //
 //
 func (si * sickerInfo) msgMain() []byte {
+    // 从 public.go 中生成患者ID
     userid := createUserID()
+    log := fmt.Sprintf("患者姓名:%s,患者ID:%s,住院号:%s,就诊号:%s",si.Name,userid,si.Hospital_number,si.Attandance_number)
     
     _,err := DB.Exec("insert into sicker (userid,name,age,gender,telphone,hospital_number,attandance_number,disease,out_hospital,writer) values (?,?,?,?,?,?,?,?,?,?)",
         userid,
@@ -115,11 +123,11 @@ func (si * sickerInfo) msgMain() []byte {
         si.Writer)
 
     if err != nil{
-        pnt.Error(err)
+        pnt.Errorf("添加患者失败-err:%v-info:%s",err,log)
         return reParseJson(getAns(0,"添加失败！",""))
 
     }else{
-        pnt.MySQL(si.Name,userid+" 添加患者成功")
+        pnt.Infof("添加患者成功-info:%s",log)
         return reParseJson(getAns(1,"添加成功！",userid))
     }
 }
@@ -134,7 +142,7 @@ func (ri * riskInfo) msgMain() []byte {
     var preProgramWord string
     var commentWord string
     var diy bool = false
-    
+    var log string = fmt.Sprintf("患者ID:%s",ri.Userid)
     // 多选 非药物因素
     for _,i := range ri.Not_medication{
         notMedicationWord +=  i + ","
@@ -187,7 +195,7 @@ func (ri * riskInfo) msgMain() []byte {
         ri.Chemotherapy_timestamp)
         
     if err != nil{
-        pnt.Error(err)
+        pnt.Errorf("添加风险评估失败-err:%v-info:%s",err,log)
         return reParseJson(getAns(0,"更新失败！",""))
     }
 
@@ -199,10 +207,10 @@ func (ri * riskInfo) msgMain() []byte {
         ri.Assessment_timestamp)
 
     if erra != nil{
-        pnt.Error(erra)
+        pnt.Errorf("添加风险评估失败-err:%v-info:%s",erra,log)
         return reParseJson(getAns(0,"更新失败！",""))
     }else{
-        pnt.MySQL(ri.Userid," 风险评估 更新成功")
+        pnt.Errorf("添加风险评估成功-info:%s",log)
         return reParseJson(getAns(1,"更新成功！",""))
     }
     
@@ -216,6 +224,7 @@ func (ri * riskInfo) msgMain() []byte {
 func (ni * nurseInfo) msgMain() []byte {
 
     var MeasureWord string
+    var log string = fmt.Sprintf("患者ID:%s,化疗周期:%d,护理次序:%d",ni.Userid,ni.Cycle_seq,ni.Nurse_seq)
     // 多选 非药物因素
     for _,i := range ni.Measure{
         MeasureWord +=  i + ","
@@ -241,7 +250,7 @@ func (ni * nurseInfo) msgMain() []byte {
         ni.Assessment_timestamp)
 
     if err != nil{
-        pnt.Error(err)
+        pnt.Errorf("插入护理评估失败-err:%s-info:%s",err,log)
         return reParseJson(getAns(0,"更新失败！",""))
 
     }
@@ -249,11 +258,11 @@ func (ni * nurseInfo) msgMain() []byte {
     if ni.Out_hospital == "1"{
         _,err := DB.Exec("UPDATE sicker SET out_hospital=?,follow_over=? where userid=?",t,"2",ni.Userid)
         if err !=nil{
-            pnt.Error(err)
+            pnt.Errorf("插入护理评估失败-err:%s-info:%s\n",err,log)
             return reParseJson(getAns(0,"更新失败！",""))
         }
     }
-    pnt.MySQL(fmt.Sprintf("插入护理评估 患者ID:%s,化疗周期:%d,护理次序:%d 成功",ni.Userid,ni.Cycle_seq,ni.Nurse_seq))
+    pnt.Infof("插入护理评估成功-info:%s",log)
     return reParseJson(getAns(1,"更新成功！",""))
     
 
@@ -269,6 +278,8 @@ func (fi * followInfo) msgMain() []byte {
     var outContentWord string
     var diy bool = false
     var satisfaction_total int
+    var log string = fmt.Sprintf("患者ID:%s,随访周期:%s",fi.Userid)
+
     // 多选 非药物因素
     for _,i := range fi.Out_content{
         if i == "diy" {
@@ -317,7 +328,7 @@ func (fi * followInfo) msgMain() []byte {
         fi.Follow_follow_timestamp)
 
         if err != nil{
-            pnt.Error(err)
+            pnt.Errorf("随访更新失败-err:%v-log:%s",err,log)
             return reParseJson(getAns(0,"更新失败！",""))
         }
         
@@ -325,20 +336,16 @@ func (fi * followInfo) msgMain() []byte {
         if fi.Follow_over == "1"{
             _,err := DB.Exec("UPDATE sicker set follow_over=? where userid=?",1,fi.Userid)
             if err != nil{
-                pnt.Error(err)
+                pnt.Errorf("随访更新失败-err:%v-log:%s",err,log)
                 return reParseJson(getAns(0,"更新失败！",""))
             }
         }
-        pnt.MySQL(fmt.Sprintf("%s %s 护理评估 更新成功",fi.Userid,fi.Follow_seq))
+        pnt.Errorf("随访更新成功-log:%s",log)
         return reParseJson(getAns(1,"更新成功！",""))
         
 }
 
-//
-//
 // 搜索 患者
-//
-//
 func (ss * searchSicker) msgMain() []byte {
     n := ss.Name 
     h := ss.Hospital_number
@@ -402,22 +409,117 @@ func (ss * searchSicker) msgMain() []byte {
         }
     case 2:
         pnt.Search("姓名:%s,住院号:%s\n",n,h)
-        //DB.Query("SELECT name,hospital_number,attandance_number FROM where name=? and hospital_number=? and attandance_number=?",n,h,z)
+        rows, err := DB.Query("SELECT name,hospital_number,attandance_number,userid FROM sicker where name=? and hospital_number=?",n,h)
+        if err !=nil{
+            gloerr = err
+            break
+        }
+        defer rows.Close()
+        for rows.Next(){
+            if serr := rows.Scan(&res.S[c].Name,&res.S[c].Hospital_number,&res.S[c].Attandance_number,&res.S[c].Sicker_id);serr != nil{
+                gloerr = serr
+            }
+            res.S[c].Has = 1
+            c++
+            if c== 15{
+                break
+            }
+        }
         
     case 3:
         pnt.Search("姓名:%s,就诊号:%s\n",n,a)
-        
+        rows, err := DB.Query("SELECT name,hospital_number,attandance_number,userid FROM sicker where name=? and attandance_number=?",n,a)
+        if err !=nil{
+            gloerr = err
+            break
+        }
+        defer rows.Close()
+        for rows.Next(){
+            if serr := rows.Scan(&res.S[c].Name,&res.S[c].Hospital_number,&res.S[c].Attandance_number,&res.S[c].Sicker_id);serr != nil{
+                gloerr = serr
+            }
+            res.S[c].Has = 1
+            c++
+            if c== 15{
+                break
+            }
+        }
     case 4:
         pnt.Search("姓名:%s\n",n)
+        rows, err := DB.Query("SELECT name,hospital_number,attandance_number,userid FROM sicker where name=?",n)
+        if err !=nil{
+            gloerr = err
+            break
+        }
+        defer rows.Close()
+        for rows.Next(){
+            if serr := rows.Scan(&res.S[c].Name,&res.S[c].Hospital_number,&res.S[c].Attandance_number,&res.S[c].Sicker_id);serr != nil{
+                gloerr = serr
+            }
+            res.S[c].Has = 1
+            c++
+            if c== 15{
+                break
+            }
+        }
         
     case 5:
         pnt.Search("住院号:%s,就诊号:%s\n",h,a)
+        rows, err := DB.Query("SELECT name,hospital_number,attandance_number,userid FROM sicker where hospital_number=? and attandance_number=?",h,a)
+        if err !=nil{
+            gloerr = err
+            break
+        }
+        defer rows.Close()
+        for rows.Next(){
+            if serr := rows.Scan(&res.S[c].Name,&res.S[c].Hospital_number,&res.S[c].Attandance_number,&res.S[c].Sicker_id);serr != nil{
+                gloerr = serr
+            }
+            res.S[c].Has = 1
+            c++
+            if c== 15{
+                break
+            }
+        }
     case 6:
         pnt.Search("住院号:%s\n",h)
+        rows, err := DB.Query("SELECT name,hospital_number,attandance_number,userid FROM sicker where hospital_number=?",h)
+        if err !=nil{
+            gloerr = err
+            break
+        }
+        defer rows.Close()
+        for rows.Next(){
+            if serr := rows.Scan(&res.S[c].Name,&res.S[c].Hospital_number,&res.S[c].Attandance_number,&res.S[c].Sicker_id);serr != nil{
+                gloerr = serr
+            }
+            res.S[c].Has = 1
+            c++
+            if c== 15{
+                break
+            }
+        }
     case 7:
         pnt.Search("就诊号:%s\n",a)
+        rows, err := DB.Query("SELECT name,hospital_number,attandance_number,userid FROM sicker where attandance_number=?",a)
+        if err !=nil{
+            gloerr = err
+            break
+        }
+        defer rows.Close()
+        for rows.Next(){
+            if serr := rows.Scan(&res.S[c].Name,&res.S[c].Hospital_number,&res.S[c].Attandance_number,&res.S[c].Sicker_id);serr != nil{
+                gloerr = serr
+            }
+            res.S[c].Has = 1
+            c++
+            if c== 15{
+                break
+            }
+        }
     default:
-        pnt.Search("空搜索")
+        return reParseJson(getAns(1,"暂不支持该类型的搜索方式！",""))
+
     }
 
     if gloerr != nil{
@@ -431,11 +533,13 @@ func (ss * searchSicker) msgMain() []byte {
 }
 // 搜索 患者 详细信息:
 func (sds * searchDeatilSick) msgMain() []byte{
+    pnt.Search("搜索患者详细信息-患者ID:%s",sds.Userid)
+
     var sdsr searchDeatilSickRes
     err := DB.QueryRow("SELECT name,age,gender,telphone,hospital_number,attandance_number,disease FROM sicker where userid=?",
     sds.Userid).Scan(&sdsr.Name,&sdsr.Age,&sdsr.Gender,&sdsr.Telphone,&sdsr.Hospital_number,&sdsr.Attandance_number,&sdsr.Disease)
     if err != nil{
-        pnt.Error(err)
+        pnt.Infof("搜索患者详细信息-患者ID:%s-搜索失败,%v",sds.Userid,err)
         sdsr.Status=0
         return reParseJson(sdsr)
     }
@@ -445,6 +549,8 @@ func (sds * searchDeatilSick) msgMain() []byte{
 
 // 搜索 患者 化疗周期
 func (ci * cycleInfo) msgMain() []byte {
+    pnt.Search("搜索患者化疗周期-患者ID:%s",ci.Userid)
+
     var cir cycleInfoRes
     var d,t string
     var c int = 0
@@ -453,7 +559,7 @@ func (ci * cycleInfo) msgMain() []byte {
     if err != sql.ErrNoRows{
         cir.Status=1
     }else if err != nil{
-        pnt.Error(err)
+        pnt.Infof("搜索患者化疗周期-患者ID:%s,%v",ci.Userid,err)
         cir.Status=0
         return reParseJson(cir)
     }

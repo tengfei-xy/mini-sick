@@ -12,8 +12,8 @@ func Init(s interface{}){
 func Info(s interface{}){
 	fmt.Println(now()," Info      ",s)
 }
-func Infof(f string,a ...interface{}){
-	fmt.Println(now()," Info      ",fmt.Sprintf(f,a...))
+func Infof(f string,s ...interface{}){
+	fmt.Println(now()," Info      ",fmt.Sprintf(f,s...))
 }
 func MySQL(s ...interface{}){
 	fmt.Print(now(),"  MySQL     ")
@@ -37,6 +37,9 @@ func Warn(f string,a ...interface{}){
 }
 func Error(s error){
 	fmt.Println(now()," Error     ",s)
+}
+func Errorf(f string,a ...interface{}){
+	fmt.Println(now()," Error     ",fmt.Sprintf(f,a...))
 }
 func Errorwd(v interface {},s error){
 	fmt.Println(now()," Error     ",v,s)

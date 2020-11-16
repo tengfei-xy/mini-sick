@@ -8,8 +8,8 @@ CREATE TABLE IF NOT EXISTS `sicker`(
    `age` INT NOT NULL,
    `gender` CHAR(2) NOT NULL,
    `telphone` CHAR(11) NOT NULL,
-   `hospital_number` INT,
-   `attandance_number` INT,
+   `hospital_number` VARCHAR(12),
+   `attandance_number` VARCHAR(12),
    `disease` VARCHAR(20) NOT NULL,
    `out_hospital` char(16),
    `follow_over` tinyint,
@@ -24,8 +24,8 @@ type sickerInfo struct {
     Age                     int     `json:"age"`
     Gender                  string  `json:"gender"`
     Telphone                string  `json:"telphone"`
-    Hospital_number         int     `json:"hospital_number"`
-    Attandance_number       int     `json:"attandance_number"`
+    Hospital_number         string  `json:"hospital_number"`
+    Attandance_number       string  `json:"attandance_number"`
     Disease                 string  `json:"disease"`
     Writer                  string  `json:"writer"`
 }
@@ -40,9 +40,6 @@ CREATE TABLE IF NOT EXISTS `users`(
    `type` tinyint NOT NULL,
    PRIMARY KEY ( `account` )
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
-type:用户类型
-1:test
-2:nurse
 */
 type userInfo struct {
     Account                 string  `json:"account"`
@@ -237,8 +234,8 @@ type searchDeatilSickRes struct{
     Age                     int     `json:"age"`
     Gender                  string  `json:"gender"`
     Telphone                string  `json:"telphone"`
-    Hospital_number         int     `json:"hospital_number"`
-    Attandance_number       int     `json:"attandance_number"`
+    Hospital_number         string  `json:"hospital_number"`
+    Attandance_number       string  `json:"attandance_number"`
     Disease                 string  `json:"disease"`
 }
 
