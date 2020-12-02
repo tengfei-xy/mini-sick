@@ -97,6 +97,18 @@ func msgMain(msg []byte) []byte{
 		parseJSON(&msg,&wgrc)
 		return wgrc.msgMain()
 
+	// 查询 高止吐风险
+	case Act_Search_Height_Risk:
+		var hrrc heightRiskRec
+		parseJSON(&msg,&hrrc)
+		return hrrc.msgMain()
+
+	// 查询上次周期内容
+	case Act_Req_Cylce_Last:
+		var clrc cycleLastRec
+		parseJSON(&msg,&clrc)
+		return clrc.msgMain()
+
 	default:
 		pnt.Info(msgtype)
 

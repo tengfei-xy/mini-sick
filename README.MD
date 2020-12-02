@@ -20,4 +20,14 @@
 后台服务器:golang
 
 ## 项目代码更新信息
-- 2020-11-17 格式化输出Log、住院号、就诊号换成string,修改认证登录方式、支持更多搜索条件
+- 2020-11-17 格式化输出Log、住院号、就诊号换成string,修改认证登录方式、支持更多搜索条件if(hdc==GH)1765
+
+
+
+## weui
+.weui-form__control-area {
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;
+  flex: 1;
+  margin: 48px 0;
+}

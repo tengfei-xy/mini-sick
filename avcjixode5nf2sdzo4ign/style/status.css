@@ -1,0 +1,97 @@
+.table_theme{
+    display: block;
+    font-size: 2em;
+    margin-block-start: 0.67em;
+    margin-block-end: 0.67em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    text-align: center;
+
+}
+.line{
+    padding: 16px;
+}
+.line_title{
+    display: block;
+    font-size: 1.5em;
+    margin-block-start: 0.83em;
+    margin-block-end: 0.83em;
+    margin-inline-start: 30px;
+    margin-inline-end: 0px;
+}
+.table-input{
+
+    color: var(--weui-FG-0);
+    margin-inline-start: 45px;
+    font-size:20px;
+    padding-left: 15px;
+    background-color: var(--weui-BG-0);
+    border-bottom: 1px solid #555555!important;
+    border-top-style:none;
+    border-left-style:none;
+    border-right-style:none;
+    width: 75%;
+    line-height: 40px;;
+}
+#risk_content{
+    display: none;
+}
+#nurse_content{
+    display: none;
+}
+#follow_content{
+    display: none;
+}
+.time{
+    font-size: 20px;
+    color: var(--weui-FG-0);
+}
+.text_center{
+    text-align: center;
+}
+#risk_grand_pic{
+    display: none;
+}
+.choose_table{
+    font-size: 20px;
+    border-bottom: none;
+    border-top-style: none;
+    border-left-style: none;
+    border-right-style: none;
+    width: 90%;
+}
+.small_tabll_title{
+    font-size: 1.1em;
+    margin-block-start: 0.83em;
+    margin-block-end: 0.83em;
+    margin-inline-end: 0px;
+}
+.table_small_space{
+    margin-block-start: 1rem;
+    margin-block-end: 1rem;
+}
+.tab{
+    margin-inline-start: 45px;
+}
+.satisfaction_title{
+    font-size: 1.2em;
+
+}
+
+.line>a{
+    text-decoration: underline;
+}
+#satisfaction_total{
+    display: none;
+}
+.line_title_small{
+    display: block;
+    font-size: 1.2em;
+    margin-block-start: 0.83em;
+    margin-block-end: 0.83em;
+    margin-inline-start: 30px;
+    margin-inline-end: 0px;
+}
+#risk_last{
+    display: none;
+}
