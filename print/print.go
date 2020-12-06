@@ -6,9 +6,6 @@ import(
 func now() string {
 	return time.Now().Format("2006-01-02 15:04:05")
 }
-func Init(s interface{}){
-	fmt.Println(now()," Init      ",s)
-}
 func IP(ip string){
 	fmt.Println(now()," IP        ",ip)
 }
