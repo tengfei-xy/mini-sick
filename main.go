@@ -29,11 +29,14 @@ func mainInitEnv(){
 	}
 	path := filepath.Dir(ex)
 	pathindex := strings.LastIndex(path,"/") +1
-	port = "80" + path[pathindex:len(path)]
+	podID = path[pathindex:len(path)]
+	port = "80" + podID
 
 	// 将所在路径作为数据库名称
-	x,_ := strconv.Atoi(port[2:4])
+	x,_ := strconv.Atoi(podID)
 	podID = fmt.Sprintf("%x",x)
+	DB = mainInitMySQL()  
+
 }
 
 func mainInitMySQL() * sql.DB {
@@ -61,8 +64,7 @@ func mainInitMySQL() * sql.DB {
 
 func main (){
 	mainInitEnv()
-	DB = mainInitMySQL()
-	pnt.Infof("PodID:%s,Port:%s,Start!\n",podID,port)
+	pnt.Infof("PodID:%s,Port:%s,Start!",podID,port)
 	http.HandleFunc("/", index)
 	go pnt.Info(http.ListenAndServe("0.0.0.0:" + port, nil))
 
@@ -75,5 +77,4 @@ func index(w http.ResponseWriter, r *http.Request){
 	}
 	pnt.Json(string(msg))
 	w.Write(msgMain(msg))
-
 }

@@ -1,7 +1,7 @@
 package main
 
 // 患者表
-/* 
+/*
 CREATE TABLE IF NOT EXISTS `sicker`(
    `userid` CHAR(15) NOT NULL,
    `name` VARCHAR(6),
@@ -18,24 +18,23 @@ CREATE TABLE IF NOT EXISTS `sicker`(
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 */
 type sickerInfo struct {
-    Action                  string              `json:"action"`
+	Action string `json:"action"`
 
-    Userid                  string              `json:"userid"`
-    Name                    string              `json:"name"`
-    Age                     string              `json:"age"`
-    Gender                  string              `json:"gender"`
-    Telphone                string              `json:"telphone"`
-    Hospital_number         string              `json:"hospital_number"`
-    Attandance_number       string              `json:"attandance_number"`
-    Disease                 string              `json:"disease"`
+	Userid            string `json:"userid"`
+	Name              string `json:"name"`
+	Age               string `json:"age"`
+	Gender            string `json:"gender"`
+	Telphone          string `json:"telphone"`
+	Hospital_number   string `json:"hospital_number"`
+	Attandance_number string `json:"attandance_number"`
+	Disease           string `json:"disease"`
 
-    Writer                  string              `json:"writer"`
-    Way                     int                 `json:"way"`
+	Writer string `json:"writer"`
+	Way    int    `json:"way"`
 }
 
-
 // 用户表
-/* 
+/*
 CREATE TABLE IF NOT EXISTS `users`(
    `account` VARCHAR(15) NOT NULL,
    `name` VARCHAR(10) DEFAULT '',
@@ -45,14 +44,13 @@ CREATE TABLE IF NOT EXISTS `users`(
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 */
 type userInfo struct {
-    Account                 string              `json:"account"`
-    Name                    string              `json:"name"`
-    Password                string              `json:"password"`
+	Account  string `json:"account"`
+	Name     string `json:"name"`
+	Password string `json:"password"`
 }
 
-
 // 风险评估表
-/* 
+/*
 CREATE TABLE IF NOT EXISTS `risk`(
    `userid` CHAR(15) NOT NULL,
    `cycle_seq` INT NOT NULL,
@@ -79,32 +77,31 @@ CREATE TABLE IF NOT EXISTS `risk`(
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 */
 type riskInfo struct {
-    Action                  string              `json:"Action"`
-    Userid                  string              `json:"userid"`
-    Cycle_seq               int                 `json:"cycle_seq"`
+	Action    string `json:"Action"`
+	Userid    string `json:"userid"`
+	Cycle_seq int    `json:"cycle_seq"`
 
-    Program                 string              `json:"program"`
-    Not_medication          string              `json:"not_medication"`
-    Medication              string              `json:"medication"`
-    Grand                   string              `json:"grand"`
-    Pre_program             string              `json:"pre_program"`
-    Pre_program_diy         string              `json:"pre_program_diy"`
-    Comment                 string              `json:"comment"`
-    Comment_diy             string              `json:"comment_diy"`
-    Need_nurse              string              `json:"need_nurse"`
+	Program         string `json:"program"`
+	Not_medication  string `json:"not_medication"`
+	Medication      string `json:"medication"`
+	Grand           string `json:"grand"`
+	Pre_program     string `json:"pre_program"`
+	Pre_program_diy string `json:"pre_program_diy"`
+	Comment         string `json:"comment"`
+	Comment_diy     string `json:"comment_diy"`
+	Need_nurse      string `json:"need_nurse"`
 
-    Writer                  string              `json:"writer"`
-    Assessment_date         string              `json:"assessment_date"`
-    Assessment_time         string              `json:"assessment_time"`
-    Assessment_timestamp    string              `json:"assessment_timestamp"`
-    Chemotherapy_date       string              `json:"chemotherapy_date"`
-    Chemotherapy_time       string              `json:"chemotherapy_time"`
-    Chemotherapy_timestamp  string              `json:"chemotherapy_timestamp"`
+	Writer                 string `json:"writer"`
+	Assessment_date        string `json:"assessment_date"`
+	Assessment_time        string `json:"assessment_time"`
+	Assessment_timestamp   string `json:"assessment_timestamp"`
+	Chemotherapy_date      string `json:"chemotherapy_date"`
+	Chemotherapy_time      string `json:"chemotherapy_time"`
+	Chemotherapy_timestamp string `json:"chemotherapy_timestamp"`
 
-    Name                    string              `json:"name"`
-    Updated                 int                 `json:"updated"`
+	Name    string `json:"name"`
+	Updated int    `json:"updated"`
 }
-
 
 /* 护理评估表
 CREATE TABLE IF NOT EXISTS `nurse`(
@@ -125,26 +122,25 @@ CREATE TABLE IF NOT EXISTS `nurse`(
    PRIMARY KEY ( `userid`,`cycle_seq`,`nurse_seq` )
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 */
-type nurseInfo struct{
-    Userid                  string              `json:"userid"`
-    Cycle_seq               int                 `json:"cycle_seq"`
-    Nurse_seq               int                 `json:"nurse_seq"`
+type nurseInfo struct {
+	Userid    string `json:"userid"`
+	Cycle_seq int    `json:"cycle_seq"`
+	Nurse_seq int    `json:"nurse_seq"`
 
-    Nausea_assessment       string              `json:"nausea_assessment"` 
-    Emesis_assessment       string              `json:"emesis_assessment"`
-    Measure                 string              `json:"measure"`
-    Comment                 string              `json:"comment"`
-    Out_hospital            string              `json:"out_hospital"`
+	Nausea_assessment string `json:"nausea_assessment"`
+	Emesis_assessment string `json:"emesis_assessment"`
+	Measure           string `json:"measure"`
+	Comment           string `json:"comment"`
+	Out_hospital      string `json:"out_hospital"`
 
-    Writer                  string              `json:"writer"`
-    Assessment_date         string              `json:"nurse_assessment_date"`
-    Assessment_time         string              `json:"nurse_assessment_time"`
-    Assessment_timestamp    string              `json:"nurse_assessment_timestamp"`
-
+	Writer               string `json:"writer"`
+	Assessment_date      string `json:"nurse_assessment_date"`
+	Assessment_time      string `json:"nurse_assessment_time"`
+	Assessment_timestamp string `json:"nurse_assessment_timestamp"`
 }
 
 // 随访记录
-/* 
+/*
  CREATE TABLE IF NOT EXISTS `follow`(
    `userid` CHAR(15) NOT NULL,
    `cycle_seq` INT NOT NULL,
@@ -168,27 +164,27 @@ type nurseInfo struct{
    PRIMARY KEY ( `userid`,`cycle_seq`,`follow_seq` )
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 */
-type followInfo struct{
-    Userid                  string              `json:"userid"`
-    Cycle_seq               int                 `json:"cycle_seq"`
-    Follow_seq              int                 `json:"follow_seq"`
-    Hight_risk              string              `json:"hight_risk"`
-    Emesis_grade            string              `json:"emesis_grade"`
-    Nausea_grade            string              `json:"nausea_grade"`
-    Out_content             string              `json:"out_content"`
-    Out_content_diy         string              `json:"out_content_diy"`
-    Follow_over             string              `json:"follow_over"`
-    Satisfaction_1          string              `json:"satisfaction_1"`
-    Satisfaction_2          string              `json:"satisfaction_2"`
-    Satisfaction_3          string              `json:"satisfaction_3"`
-    Satisfaction_4          string              `json:"satisfaction_4"`
-    Satisfaction_5          string              `json:"satisfaction_5"`
-    Satisfaction_total      string              `json:"satisfaction_total"`
+type followInfo struct {
+	Userid             string `json:"userid"`
+	Cycle_seq          int    `json:"cycle_seq"`
+	Follow_seq         int    `json:"follow_seq"`
+	Hight_risk         string `json:"hight_risk"`
+	Emesis_grade       string `json:"emesis_grade"`
+	Nausea_grade       string `json:"nausea_grade"`
+	Out_content        string `json:"out_content"`
+	Out_content_diy    string `json:"out_content_diy"`
+	Follow_over        string `json:"follow_over"`
+	Satisfaction_1     string `json:"satisfaction_1"`
+	Satisfaction_2     string `json:"satisfaction_2"`
+	Satisfaction_3     string `json:"satisfaction_3"`
+	Satisfaction_4     string `json:"satisfaction_4"`
+	Satisfaction_5     string `json:"satisfaction_5"`
+	Satisfaction_total string `json:"satisfaction_total"`
 
-    Writer                  string              `json:"writer"`
-    Follow_follow_date      string              `json:"follow_follow_date"`
-    Follow_follow_time      string              `json:"follow_follow_time"`
-    Follow_follow_timestamp string              `json:"follow_follow_timestamp"`
+	Writer                  string `json:"writer"`
+	Follow_follow_date      string `json:"follow_follow_date"`
+	Follow_follow_time      string `json:"follow_follow_time"`
+	Follow_follow_timestamp string `json:"follow_follow_timestamp"`
 }
 
 // 化疗周期
@@ -206,212 +202,223 @@ PRIMARY KEY ( `userid`,`cycle_seq` )
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 */
 // 小程序应答结构体
-type ans struct{
-    Status                  int                 `json:"status"`
-    Explain                 string              `json:"explain"`
-    Data                    string              `json:"data"`
+type ans struct {
+	Status  int    `json:"status"`
+	Explain string `json:"explain"`
+	Data    string `json:"data"`
 }
-type cycleInfo struct{
-    Action                  string              `json:"Action"`
-    Userid                  string              `json:"userid"`
+type cycleInfo struct {
+	Action string `json:"Action"`
+	Userid string `json:"userid"`
 }
-type cycleInfoRes struct{
-    ans
-    S                       [15]cycleInfoResS   `json:"data"`
+type cycleInfoRes struct {
+	ans
+	S [15]cycleInfoResS `json:"data"`
 }
-type cycleInfoResS struct{
-    Userid                  string              `json:"userid"`
-    Cycle_seq               int                 `json:"cycle_seq"`
-    Anstime                 string              `json:"time"`
-    Has                     int                 `json:"has"`
+type cycleInfoResS struct {
+	Userid    string `json:"userid"`
+	Cycle_seq int    `json:"cycle_seq"`
+	Anstime   string `json:"time"`
+	Has       int    `json:"has"`
 }
-type searchSicker struct{
-    Name                    string              `json:"name"`
-    Hospital_number         string              `json:"hospital_number"`
-    Attandance_number       string              `json:"attandance_number"`
-    Sicker_id               string              `json:"userid"`
-    Has                     int                 `json:"has"`
+type searchSicker struct {
+	Name              string `json:"name"`
+	Hospital_number   string `json:"hospital_number"`
+	Attandance_number string `json:"attandance_number"`
+	Sicker_id         string `json:"userid"`
+	Has               int    `json:"has"`
 }
-type searchSickerRes struct{
+type searchSickerRes struct {
+	ans
+	S [15]searchSicker `json:"data"`
+}
+type searchDeatilSick struct {
+	Action string `json:"action"`
+	Userid string `json:"userid"`
+}
+type searchDeatilSickRes struct {
+	ans
+	Name              string `json:"name"`
+	Age               string `json:"age"`
+	Gender            string `json:"gender"`
+	Telphone          string `json:"telphone"`
+	Hospital_number   string `json:"hospital_number"`
+	Attandance_number string `json:"attandance_number"`
+	Disease           string `json:"disease"`
+}
 
-    ans
-    S                       [15] searchSicker   `json:"data"`
+type riskInfoRec struct {
+	Action    string `json:"action"`
+	Userid    string `json:"userid"`
+	Cycle_seq int    `json:"cycle_seq"`
 }
-type searchDeatilSick struct{
-    Action                  string              `json:"action"`
-    Userid                  string              `json:"userid"`
-}
-type searchDeatilSickRes struct{
-    ans
-    Name                    string              `json:"name"`
-    Age                     string              `json:"age"`
-    Gender                  string              `json:"gender"`
-    Telphone                string              `json:"telphone"`
-    Hospital_number         string              `json:"hospital_number"`
-    Attandance_number       string              `json:"attandance_number"`
-    Disease                 string              `json:"disease"`
-}
+type riskInfoRes struct {
+	ans
 
-type riskInfoRec struct{
-    Action                  string              `json:"action"`
-    Userid                  string              `json:"userid"`
-    Cycle_seq               int                 `json:"cycle_seq"`
-}
-type riskInfoRes struct{
-    ans
+	Userid    string `json:"userid"`
+	Cycle_seq int    `json:"cycle_seq"`
 
-    Userid                  string              `json:"userid"`
-    Cycle_seq               int                 `json:"cycle_seq"`
+	Program         string `json:"program"`
+	Not_medication  string `json:"not_medication"`
+	Medication      string `json:"medication"`
+	Grand           string `json:"grand"`
+	Pre_program     string `json:"pre_program"`
+	Pre_program_diy string `json:"pre_program_diy"`
+	Comment         string `json:"comment"`
+	Comment_diy     string `json:"comment_diy"`
+	Need_nurse      string `json:"need_nurse"`
 
-    Program                 string              `json:"program"`
-    Not_medication          string              `json:"not_medication"`
-    Medication              string              `json:"medication"`
-    Grand                   string              `json:"grand"`
-    Pre_program             string              `json:"pre_program"`
-    Pre_program_diy         string              `json:"pre_program_diy"`
-    Comment                 string              `json:"comment"`
-    Comment_diy             string              `json:"comment_diy"`
-    Need_nurse              string              `json:"need_nurse"`
+	Last_risk_grand    string `json:"last_risk_grand"`
+	Last_nurse_emesis  string `json:"last_nurse_emesis"`
+	Last_nurse_nausea  string `json:"last_nurse_nausea"`
+	Last_follow_emesis string `json:"last_follow_emesis"`
+	Last_follow_nausea string `json:"last_follow_nausea"`
 
-    Last_risk_grand         string              `json:"last_risk_grand"`
-    Last_nurse_emesis       string              `json:"last_nurse_emesis"`
-    Last_nurse_nausea       string              `json:"last_nurse_nausea"`
-    Last_follow_emesis      string              `json:"last_follow_emesis"`
-    Last_follow_nausea      string              `json:"last_follow_nausea"`
-
-    Writer                  string              `json:"writer"`
-    Assessment_date         string              `json:"assessment_date"`
-    Assessment_time         string              `json:"assessment_time"`
-    Assessment_timestamp    string              `json:"assessment_timestamp"`
-    Chemotherapy_date       string              `json:"chemotherapy_date"`
-    Chemotherapy_time       string              `json:"chemotherapy_time"`
-    Chemotherapy_timestamp  string              `json:"chemotherapy_timestamp"`
+	Writer                 string `json:"writer"`
+	Assessment_date        string `json:"assessment_date"`
+	Assessment_time        string `json:"assessment_time"`
+	Assessment_timestamp   string `json:"assessment_timestamp"`
+	Chemotherapy_date      string `json:"chemotherapy_date"`
+	Chemotherapy_time      string `json:"chemotherapy_time"`
+	Chemotherapy_timestamp string `json:"chemotherapy_timestamp"`
 }
 type nurseTableRec struct {
-    Action                  string              `json:"action"`
-    Userid                  string              `json:"userid"`
-    Cycle_seq               int                 `json:"cycle_seq"`
+	Action    string `json:"action"`
+	Userid    string `json:"userid"`
+	Cycle_seq int    `json:"cycle_seq"`
 }
-type nurseTable struct{
-    Nurse_seq               int                 `json:"nurse_seq"`
-    Time                    string              `json:"time"`
-    Has                     int                 `json:"has"`
+type nurseTable struct {
+	Nurse_seq int    `json:"nurse_seq"`
+	Time      string `json:"time"`
+	Has       int    `json:"has"`
 }
 type nurseTableReS struct {
-    ans
-    N                       [15]nurseTable
+	ans
+	N [15]nurseTable
 }
-type nurseInfoRec struct{
-    Action                  string              `json:"action"`
-    Userid                  string              `json:"userid"`
-    Cycle_seq               int                 `json:"cycle_seq"`
-    Nurse_seq               int                 `json:"nurse_seq"`
+type nurseInfoRec struct {
+	Action    string `json:"action"`
+	Userid    string `json:"userid"`
+	Cycle_seq int    `json:"cycle_seq"`
+	Nurse_seq int    `json:"nurse_seq"`
 }
-type nurseInfoRes struct{
-    ans
-    Userid                  string              `json:"userid"`
-    Cycle_seq               int                 `json:"cycle_seq"`
-    Nurse_seq               int                 `json:"nurse_seq"`
+type nurseInfoRes struct {
+	ans
+	Userid    string `json:"userid"`
+	Cycle_seq int    `json:"cycle_seq"`
+	Nurse_seq int    `json:"nurse_seq"`
 
-    Nausea_assessment       string              `json:"nausea_assessment"` 
-    Emesis_assessment       string              `json:"emesis_assessment"`
-    Measure                 string              `json:"measure"`
-    Comment                 string              `json:"comment"`
-    Out_hospital            string              `json:"out_hospital"`
+	Nausea_assessment string `json:"nausea_assessment"`
+	Emesis_assessment string `json:"emesis_assessment"`
+	Measure           string `json:"measure"`
+	Comment           string `json:"comment"`
+	Out_hospital      string `json:"out_hospital"`
 
-    Writer                  string              `json:"writer"`
-    Assessment_date         string              `json:"nurse_assessment_date"`
-    Assessment_time         string              `json:"nurse_assessment_time"`
-    Assessment_timestamp    string              `json:"nurse_assessment_timestamp"`
+	Writer               string `json:"writer"`
+	Assessment_date      string `json:"nurse_assessment_date"`
+	Assessment_time      string `json:"nurse_assessment_time"`
+	Assessment_timestamp string `json:"nurse_assessment_timestamp"`
 }
 
-type outHospitalRec struct{
-    Action                  string              `json:"action"`
-    Userid                  string              `json:"userid"`
-    Cycle_seq               int                 `json:"cycle_seq"`
+type outHospitalRec struct {
+	Action    string `json:"action"`
+	Userid    string `json:"userid"`
+	Cycle_seq int    `json:"cycle_seq"`
 }
-type outHospitalRes struct{
-    ans
-    Explain                 string              `json:"explain"`
-    Time                    string              `json:"time"`
+type outHospitalRes struct {
+	ans
+	Explain string `json:"explain"`
+	Time    string `json:"time"`
+}
+type followTable struct {
+	Follow_seq int    `json:"follow_seq"`
+	Time       string `json:"time"`
+	Has        int    `json:"has"`
+}
+type followTableRec struct {
+	Action    string `json:"action"`
+	Userid    string `json:"userid"`
+	Cycle_seq int    `json:"cycle_seq"`
+}
+type followTableRes struct {
+	ans
+	N [15]followTable
+}
+type followContentRec struct {
+	Action     string `json:"action"`
+	Userid     string `json:"userid"`
+	Cycle_seq  int    `json:"cycle_seq"`
+	Follow_seq int    `json:"follow_seq"`
+}
+type followContentRes struct {
+	ans
 
+	Userid                  string `json:"userid"`
+	Cycle_seq               int    `json:"cycle_seq"`
+	Follow_seq              int    `json:"follow_seq"`
+	Hight_risk              string `json:"hight_risk"`
+	Emesis_grade            string `json:"emesis_grade"`
+	Nausea_grade            string `json:"nausea_grade"`
+	Out_content             string `json:"out_content"`
+	Out_content_diy         string `json:"out_content_diy"`
+	Follow_over             string `json:"follow_over"`
+	Satisfaction_1          string `json:"satisfaction_1"`
+	Satisfaction_2          string `json:"satisfaction_2"`
+	Satisfaction_3          string `json:"satisfaction_3"`
+	Satisfaction_4          string `json:"satisfaction_4"`
+	Satisfaction_5          string `json:"satisfaction_5"`
+	Satisfaction_total      string `json:"satisfaction_total"`
+	Writer                  string `json:"writer"`
+	Follow_follow_date      string `json:"follow_follow_date"`
+	Follow_follow_time      string `json:"follow_follow_time"`
+	Follow_follow_timestamp string `json:"follow_follow_timestamp"`
 }
-type followTable struct{
-    Follow_seq              int                 `json:"follow_seq"`
-    Time                    string              `json:"time"`
-    Has                     int                 `json:"has"`
+type waitGo struct {
+	Name      string `json:"name"`
+	Userid    string `json:"userid"`
+	Cycle_seq int    `json:"cycle_seq"`
+	Has       int    `json:"has"`
+}
+type waitGoRec struct {
+	Action string `json:"action"`
+}
+type waitGoRes struct {
+	ans
+	N [15]waitGo
+}
+type heightRiskRec struct {
+	Action    string `json:"action"`
+	Userid    string `json:"userid"`
+	Cycle_seq int    `json:"cycle_seq"`
+}
+type heightRiskReS struct {
+	ans
+	Height int `json:"height"`
+}
+type cycleLastRec struct {
+	Action    string `json:"action"`
+	Userid    string `json:"userid"`
+	Cycle_seq int    `json:"cycle_seq"`
+}
+type cycleLastRes struct {
+	ans
+	Last_risk_grand    string `json:"last_risk_grand"`
+	Last_nurse_emesis  string `json:"last_nurse_emesis"`
+	Last_nurse_nausea  string `json:"last_nurse_nausea"`
+	Last_follow_emesis string `json:"last_follow_emesis"`
+	Last_follow_nausea string `json:"last_follow_nausea"`
+}
 
+type toNurse struct {
+	Name      string `json:"name"`
+	Userid    string `json:"userid"`
+	Cycle_seq int    `json:"cycle_seq"`
+	Has       int    `json:"has"`
 }
-type followTableRec struct{
-    Action                  string              `json:"action"`
-    Userid                  string              `json:"userid"`
-    Cycle_seq               int                 `json:"cycle_seq"`
+type toNurseRec struct {
+	Action string `json:"action"`
 }
-type followTableRes struct{
-    ans
-    N                       [15]followTable
-}
-type followContentRec struct{
-    Action                  string              `json:"action"`
-    Userid                  string              `json:"userid"`
-    Cycle_seq               int                 `json:"cycle_seq"`
-    Follow_seq              int                 `json:"follow_seq"`
-}
-type followContentRes struct{
-    ans
-    
-    Userid                  string              `json:"userid"`
-    Cycle_seq               int                 `json:"cycle_seq"`
-    Follow_seq              int                 `json:"follow_seq"`
-    Hight_risk              string              `json:"hight_risk"`
-    Emesis_grade            string              `json:"emesis_grade"`
-    Nausea_grade            string              `json:"nausea_grade"`
-    Out_content             string              `json:"out_content"`
-    Out_content_diy         string              `json:"out_content_diy"`
-    Follow_over             string              `json:"follow_over"`
-    Satisfaction_1          string              `json:"satisfaction_1"`
-    Satisfaction_2          string              `json:"satisfaction_2"`
-    Satisfaction_3          string              `json:"satisfaction_3"`
-    Satisfaction_4          string              `json:"satisfaction_4"`
-    Satisfaction_5          string              `json:"satisfaction_5"`
-    Satisfaction_total      string              `json:"satisfaction_total"`
-    Writer                  string              `json:"writer"`
-    Follow_follow_date      string              `json:"follow_follow_date"`
-    Follow_follow_time      string              `json:"follow_follow_time"`
-    Follow_follow_timestamp string              `json:"follow_follow_timestamp"`
-}
-type waitGo struct{
-    Name                    string              `json:"name"`
-    Userid                  string              `json:"userid"`
-    Cycle_seq               int                 `json:"cycle_seq"`
-    Has                     int                 `json:"has"`
-}
-type waitGoRec struct{
-    Action                  string              `json:"action"`
-}
-type waitGoRes struct{
-    ans
-    N                       [15]waitGo
-}
-type heightRiskRec struct{
-    Action                  string              `json:"action"`
-    Userid                  string              `json:"userid"`
-    Cycle_seq               int                 `json:"cycle_seq"`
-}
-type heightRiskReS struct{
-    ans
-    Height                  int                 `json:"height"`
-}
-type cycleLastRec struct{
-    Action                  string              `json:"action"`
-    Userid                  string              `json:"userid"`
-    Cycle_seq               int                 `json:"cycle_seq"`
-}
-type cycleLastRes struct{
-    ans
-    Last_risk_grand         string              `json:"last_risk_grand"`
-    Last_nurse_emesis       string              `json:"last_nurse_emesis"`
-    Last_nurse_nausea       string              `json:"last_nurse_nausea"`
-    Last_follow_emesis      string              `json:"last_follow_emesis"`
-    Last_follow_nausea      string              `json:"last_follow_nausea"`
+type toNurseRes struct {
+	ans
+	N [15]toNurse
 }
