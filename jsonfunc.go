@@ -864,7 +864,7 @@ func (clrc *cycleLastRec) msgMain() []byte {
 	}
 
 	// 查询上次护理呕吐和恶心
-	if err := DB.QueryRow("SELECT Emesis_assessment,Nausea_assessment,nurse_seq FROM nurse WHERE userid=? AND cycle_seq=? ORDER BY nurse_seq DESC LIMIT ?",
+	if err := DB.QueryRow("SELECT Emesis_assessment,Nausea_assessment,nurse_seq FROM nurse WHERE userid=? AND cycle_seq=? ORDER BY nurse_seq ASC LIMIT ?",
 		clrc.Userid, clrc.Cycle_seq-1, 1).Scan(
 		&clrs.Last_nurse_emesis,
 		&clrs.Last_nurse_nausea,
@@ -874,7 +874,7 @@ func (clrc *cycleLastRec) msgMain() []byte {
 	}
 
 	// 查询上次随访呕吐和恶心
-	if err := DB.QueryRow("SELECT emesis_grade,nausea_grade,follow_seq FROM follow WHERE userid=? AND cycle_seq=? ORDER BY follow_seq DESC LIMIT ?",
+	if err := DB.QueryRow("SELECT emesis_grade,nausea_grade,follow_seq FROM follow WHERE userid=? AND cycle_seq=? ORDER BY follow_seq ASC LIMIT ?",
 		clrc.Userid, clrc.Cycle_seq-1, 1).Scan(
 		&clrs.Last_follow_emesis,
 		&clrs.Last_follow_nausea, &last_seq); err != nil && err != sql.ErrNoRows {
@@ -891,63 +891,24 @@ func (clrc *cycleLastRec) msgMain() []byte {
 func (tonrc *toNurseRec) msgMain() []byte {
 
 	var wgrs toNurseRes
-	var userid string
-	var cycle_seq int
 	var i int = 0
 	var log = fmt.Sprintf("查询今日护理")
 
-	// 查询化疗表中 化疗时间是昨天和需要住院护理的病人
-	rows, err := DB.Query("SELECT userid,cycle_seq FROM risk where TO_DAYS(NOW())-TO_DAYS(chemotherapy_date) =? and need_nurse=?", 1, 1)
+	// 查询周期表中 化疗时间大于1天和没有随访结束（=2）的病人
+	rows, err := DB.Query("SELECT userid,cycle_seq,name FROM cycle where LENGTH(out_hospital_time)=0 and follow_over=?", 2)
 	if err != nil {
 		pnt.Errorf("%s(化疗表)-%v", log, err)
 		return reParseJson(getAns(0, "查询失败！", ""))
 	}
 	defer rows.Close()
 	for rows.Next() {
-		err := rows.Scan(&userid, &cycle_seq)
+		err := rows.Scan(&wgrs.N[i].Userid, &wgrs.N[i].Cycle_seq, &wgrs.N[i].Name)
 		if err != nil {
 			pnt.Errorf("%s(化疗表扫描)-%v", log, err)
 			return reParseJson(getAns(0, "查询失败！", ""))
 		}
-		var assessment_date string
-		var towrite bool = false
-
-		// 查询 护理最后一次的时间
-		terr := DB.QueryRow("SELECT assessment_date FROM nurse WHERE userid=? AND cycle_seq=? ORDER BY nurse_seq DESC LIMIT ?", userid, cycle_seq, 1).Scan(&assessment_date)
-		if terr != sql.ErrNoRows {
-			if terr != nil {
-				pnt.Errorf("%s(护理表)-%v", log, terr)
-				return reParseJson(getAns(0, "查询失败！", ""))
-			}
-			t := time.Now().Day()
-			it, derr := strconv.Atoi(assessment_date[8:10])
-			if derr != nil {
-				pnt.Errorf("%s(时间转化错误)-%v", err, log)
-				return reParseJson(getAns(0, "查询失败！", ""))
-			}
-			// 护理最后一次的时间不是今天，加入到今日护理
-			if it != t {
-				towrite = true
-			} else {
-				continue
-			}
-			// 护理为空，加入到今日护理
-		} else if terr == sql.ErrNoRows {
-			towrite = true
-		}
-
-		if towrite {
-			wgrs.N[i].Cycle_seq = cycle_seq
-			wgrs.N[i].Userid = userid
-			wgrs.N[i].Has = 1
-
-			// 查询病人名称
-			if err := DB.QueryRow("SELECT name FROM cycle WHERE userid=? ", userid).Scan(&wgrs.N[i].Name); err != nil {
-				pnt.Errorf("%s(病人信息)-%v", log, err)
-				return reParseJson(getAns(0, "查询失败！", ""))
-			}
-			i++
-		}
+		wgrs.N[i].Has = 1
+		i++
 	}
 
 	if i == 0 {

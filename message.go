@@ -5,6 +5,9 @@ import (
 )
 
 func msgMain(msg []byte) []byte {
+	if len(msg) != 0 {
+		pnt.Json(string(msg))
+	}
 	msgtype := string(msg[11:22])
 
 	switch msgtype {
