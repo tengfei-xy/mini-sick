@@ -894,7 +894,7 @@ func (tonrc *toNurseRec) msgMain() []byte {
 	var i int = 0
 	var log = fmt.Sprintf("查询今日护理")
 
-	// 查询周期表中 化疗时间大于1天和没有随访结束（=2）的病人
+	// 查询周期表中 没有出院（护理未结束）和随访未结束的病人
 	rows, err := DB.Query("SELECT userid,cycle_seq,name FROM cycle where LENGTH(out_hospital_time)=0 and follow_over=?", 2)
 	if err != nil {
 		pnt.Errorf("%s(化疗表)-%v", log, err)
@@ -902,13 +902,42 @@ func (tonrc *toNurseRec) msgMain() []byte {
 	}
 	defer rows.Close()
 	for rows.Next() {
+		if err != nil {
+			pnt.Errorf("%s(化疗表)-%v", log, err)
+			return reParseJson(getAns(0, "查询失败！", ""))
+		}
 		err := rows.Scan(&wgrs.N[i].Userid, &wgrs.N[i].Cycle_seq, &wgrs.N[i].Name)
 		if err != nil {
 			pnt.Errorf("%s(化疗表扫描)-%v", log, err)
 			return reParseJson(getAns(0, "查询失败！", ""))
 		}
-		wgrs.N[i].Has = 1
-		i++
+		var t string
+		pnt.Infof("%s 护理、随访未结束 姓名:%s ID:%s", log, wgrs.N[i].Name, wgrs.N[i].Userid)
+		// 查询这个化疗周期中 化疗时间是否大于1天
+		if derr := DB.QueryRow("SELECT chemotherapy_date FROM risk WHERE TO_DAYS(NOW())-TO_DAYS(chemotherapy_date) <=? AND need_nurse=? AND userid=? AND cycle_seq=?", 1, 1, wgrs.N[i].Userid, wgrs.N[i].Cycle_seq).Scan(&t); derr == nil {
+			pnt.Infof("%s 化疗时间大于1天 姓名:%s ID:%s", log, wgrs.N[i].Name, wgrs.N[i].Userid)
+
+			// 查询这个化疗周期中 护理时间是不是今天
+			terr := DB.QueryRow("SELECT assessment_date FROM nurse WHERE userid=? AND to_days(assessment_date)=to_days(now()) AND cycle_seq=? ORDER BY nurse_seq DESC LIMIT ?", wgrs.N[i].Userid, wgrs.N[i].Cycle_seq, 1).Scan(&t)
+
+			if terr == sql.ErrNoRows {
+				pnt.Infof("%s 今日护理 姓名:%s ID:%s", log, wgrs.N[i].Name, wgrs.N[i].Userid)
+
+				wgrs.N[i].Has = 1
+				i++
+			} else if terr != nil {
+				pnt.Errorf("%s(护理表扫描)-%v", log, err)
+				return reParseJson(getAns(0, "查询失败！", ""))
+			}
+		} else if derr != sql.ErrNoRows {
+			pnt.Errorf("%s(风险表扫描)-%v", log, err)
+			return reParseJson(getAns(0, "查询失败！", ""))
+		}
+		// 超过十五个自动结束
+		if i == 15 {
+			break
+		}
+
 	}
 
 	if i == 0 {
