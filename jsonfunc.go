@@ -160,6 +160,7 @@ func (ri *riskInfo) msgMain() []byte {
 
 	// 更新风险评估
 	if ri.Updated != 0 {
+		// 更新化疗表
 		_, err := DB.Exec("UPDATE risk SET program=?,not_medication=?,medication=?,grand=?,pre_program=?,pre_program_diy=?,comment=?,comment_diy=?,need_nurse=?,writer=?,assessment_date=?,assessment_time=?,assessment_timestamp=?,chemotherapy_date=?,chemotherapy_time=?,chemotherapy_timestamp=? WHERE userid=? AND cycle_seq=? ",
 			ri.Program,
 			ri.Not_medication,
@@ -182,7 +183,12 @@ func (ri *riskInfo) msgMain() []byte {
 			ri.Cycle_seq)
 
 		if err != nil {
-			pnt.Errorf(waytext+"风险评估失败-%v-info:%s", err, log)
+			pnt.Errorf(waytext+"风险评估(化疗表)失败-%v-info:%s", err, log)
+			return reParseJson(getAns(0, waytext+"失败！", ""))
+		}
+		// 更新周期表
+		if _, err := DB.Exec("UPDATE cycle SET date=?,time=? WHERE userid=? AND cycle_seq=?", ri.Chemotherapy_date, ri.Chemotherapy_time, ri.Userid, ri.Cycle_seq); err != nil {
+			pnt.Errorf(waytext+"风险评估(周期表)失败-%v-info:%s", err, log)
 			return reParseJson(getAns(0, waytext+"失败！", ""))
 		}
 
@@ -783,7 +789,7 @@ func (wgrc *waitGoRec) msgMain() []byte {
 	var i = 0
 	nt := time.Now()
 	neight := time.Date(nt.Year(), nt.Month(), nt.Day(), 0, 0, 0, 0, time.Local)
-	rows, err := DB.Query("SELECT userid,name,out_hospital_time,cycle_seq FROM cycle WHERE follow_over!=? AND LENGTH(out_hospital_time)!=? ORDER BY cycle_seq DESC LIMIT ?", "1", 0, 1)
+	rows, err := DB.Query("SELECT userid,name,out_hospital_time,cycle_seq FROM cycle WHERE follow_over!=? AND LENGTH(out_hospital_time)!=? ORDER BY cycle_seq", "1", 0)
 	if err == sql.ErrNoRows {
 		wgrs.Status = 1
 		wgrs.Explain = "今日无随访患者！"
@@ -914,7 +920,9 @@ func (tonrc *toNurseRec) msgMain() []byte {
 		var t string
 		pnt.Infof("%s 护理、随访未结束 姓名:%s ID:%s", log, wgrs.N[i].Name, wgrs.N[i].Userid)
 		// 查询这个化疗周期中 化疗时间是否大于1天
-		if derr := DB.QueryRow("SELECT chemotherapy_date FROM risk WHERE TO_DAYS(NOW())-TO_DAYS(chemotherapy_date) <=? AND need_nurse=? AND userid=? AND cycle_seq=?", 1, 1, wgrs.N[i].Userid, wgrs.N[i].Cycle_seq).Scan(&t); derr == nil {
+
+		if derr := DB.QueryRow("SELECT chemotherapy_date FROM risk WHERE TO_DAYS(NOW())-TO_DAYS(chemotherapy_date) <? AND need_nurse=? AND userid=? AND cycle_seq=?", 1, 1, wgrs.N[i].Userid, wgrs.N[i].Cycle_seq).Scan(&t); derr == sql.ErrNoRows {
+
 			pnt.Infof("%s 化疗时间大于1天 姓名:%s ID:%s", log, wgrs.N[i].Name, wgrs.N[i].Userid)
 
 			// 查询这个化疗周期中 护理时间是不是今天
@@ -929,7 +937,7 @@ func (tonrc *toNurseRec) msgMain() []byte {
 				pnt.Errorf("%s(护理表扫描)-%v", log, err)
 				return reParseJson(getAns(0, "查询失败！", ""))
 			}
-		} else if derr != sql.ErrNoRows {
+		} else if derr != sql.ErrNoRows && derr != nil {
 			pnt.Errorf("%s(风险表扫描)-%v", log, err)
 			return reParseJson(getAns(0, "查询失败！", ""))
 		}
