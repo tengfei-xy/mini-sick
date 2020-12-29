@@ -46,7 +46,6 @@ func mainInitMySQL() *sql.DB {
 	Password := `if(hdc==MYSQL)`
 	UnixSocket := `/tmp/mysql.sock`
 	Database := `mini_sick_pod` + podID
-	//Database := `mini_sick_poda`
 
 	linkAddress := fmt.Sprintf("%s:%s@%s(%s)/%s", Username, Password, "unix", UnixSocket, Database)
 

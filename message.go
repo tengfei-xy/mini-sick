@@ -120,6 +120,12 @@ func msgMain(msg []byte) []byte {
 		parseJSON(&msg, &tonrc)
 		return tonrc.msgMain()
 
+	// 查询第一周期非药物因素
+	case Act_Req_Last_Not_Medication:
+		var lnmrc lastnotmedicationRec
+		parseJSON(&msg, &lnmrc)
+		return lnmrc.msgMain()
+
 	default:
 		pnt.Info(msgtype)
 

@@ -11,16 +11,15 @@ CREATE TABLE IF NOT EXISTS `sicker`(
    `hospital_number` VARCHAR(12),
    `attandance_number` VARCHAR(12),
    `disease` VARCHAR(20) ,
-   `know` char(11) DEFAULT '',
    `cycle_seq` INT DEFAULT '0',
+   `know` CHAR(1),
    `writer` VARCHAR(10) NOT NULL,
    `write_data`DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
    PRIMARY KEY ( `userid` )
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 */
 type sickerInfo struct {
-	Action string `json:"action"`
-
+	Action            string `json:"action"`
 	Userid            string `json:"userid"`
 	Name              string `json:"name"`
 	Age               string `json:"age"`
@@ -409,26 +408,4 @@ type cycleLastRes struct {
 	Last_nurse_nausea  string `json:"last_nurse_nausea"`
 	Last_follow_emesis string `json:"last_follow_emesis"`
 	Last_follow_nausea string `json:"last_follow_nausea"`
-}
-
-type toNurse struct {
-	Name      string `json:"name"`
-	Userid    string `json:"userid"`
-	Cycle_seq int    `json:"cycle_seq"`
-	Has       int    `json:"has"`
-}
-type toNurseRec struct {
-	Action string `json:"action"`
-}
-type toNurseRes struct {
-	ans
-	N [15]toNurse
-}
-type lastnotmedicationRec struct {
-	Action string `json:"action"`
-	Userid string `json:"userid"`
-}
-type lastnotmedicationReS struct {
-	ans
-	Not_medication string `json:"not_medication"`
 }
