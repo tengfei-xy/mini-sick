@@ -812,7 +812,7 @@ func (wgrc *waitGoRec) msgMain() []byte {
 	var i int = 0
 
 	// 随访条件：随访未结束、已出院
-	rows, err := DB.Query("SELECT userid,name,cycle_seq FROM cycle WHERE follow_over!=? AND TO_DAYS( NOW( ) ) - TO_DAYS( out_hospital_time) <= ? ORDER BY cycle_seq", "1", 2)
+	rows, err := DB.Query("SELECT userid,name,cycle_seq FROM cycle WHERE follow_over!=? AND TO_DAYS( NOW( ) ) - TO_DAYS( out_hospital_time) > ? ORDER BY cycle_seq", "1", 2)
 	// rows, err := DB.Query("SELECT userid,name,out_hospital_time,cycle_seq FROM cycle WHERE follow_over!=? AND LENGTH(out_hospital_time)!=? ORDER BY cycle_seq", "1", 0)
 	if err == sql.ErrNoRows {
 		wgrs.Status = 2
@@ -838,13 +838,12 @@ func (wgrc *waitGoRec) msgMain() []byte {
 		if err := DB.QueryRow("SELECT follow_follow_date FROM follow WHERE userid=? AND cycle_seq=? AND to_days(follow_follow_date) = to_days(now())", userid, cycle_seq).Scan(&t); err != nil {
 
 			if err == sql.ErrNoRows {
-				pnt.Search("%s 姓名:%s 随访日期:%s", log, name, t)
+				pnt.Search("%s 姓名:%s", log, name)
 				wgrs.N[i].Has = 1
 				wgrs.N[i].Userid = userid
 				wgrs.N[i].Name = name
 				wgrs.N[i].Cycle_seq = cycle_seq
 				wgrs.Status = 1
-
 				i++
 
 				if i == 15 {
