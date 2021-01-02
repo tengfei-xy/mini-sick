@@ -1,39 +1,13 @@
 package main
 
 import (
-	"bytes"
 	"database/sql"
-	"encoding/json"
 	"fmt"
-	"io"
 
 	_ "github.com/go-sql-driver/mysql"
 
 	pnt "print"
 )
-
-// json -> struct
-func parseJSON(unmsg *[]byte, v interface{}) error {
-
-	dec := json.NewDecoder(bytes.NewReader(*unmsg))
-	for {
-		if err := dec.Decode(&v); err == io.EOF {
-			break
-		} else if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// struct -> json
-func reParseJson(v interface{}) []byte {
-	textbyte, err := json.Marshal(v)
-	if err != nil {
-		pnt.Errorwd(v, err)
-	}
-	return textbyte
-}
 
 // ans
 func (a *ans) set(s int, e, d string) {
@@ -57,7 +31,7 @@ func (ui *userInfo) msgMain() []byte {
 	pnt.Info(log)
 	// 如果密码是空
 	if ui.Password == "" {
-		return reParseJson(getAns(1, "登录失败！", ""))
+		return reParseJSON(getAns(1, "登录失败！", ""))
 	}
 
 	// 账号登录方式
@@ -65,7 +39,7 @@ func (ui *userInfo) msgMain() []byte {
 		err := DB.QueryRow("SELECT name,password FROM users WHERE account=?", ui.Account).Scan(&Name, &Password)
 		if err != nil {
 			pnt.Errorf("用户登录错误-%v-info:%s", err, log)
-			return reParseJson(getAns(1, "登录错误！", ""))
+			return reParseJSON(getAns(1, "登录错误！", ""))
 		}
 
 		// 姓名登录方式
@@ -74,7 +48,7 @@ func (ui *userInfo) msgMain() []byte {
 		err := DB.QueryRow("SELECT password FROM users WHERE name=?", ui.Name).Scan(&Password)
 		if err != nil {
 			pnt.Errorf("用户登录错误-%v-info:%s", err, log)
-			return reParseJson(getAns(1, "登录错误！", ""))
+			return reParseJSON(getAns(1, "登录错误！", ""))
 		}
 	}
 
@@ -82,11 +56,11 @@ func (ui *userInfo) msgMain() []byte {
 	if ui.Password != Password {
 
 		pnt.Errorf("用户登录失败-%s-info:%s", "密码或认证方式不匹配", log)
-		return reParseJson(getAns(1, "登录失败！", ""))
+		return reParseJSON(getAns(1, "登录失败！", ""))
 	}
 
 	pnt.Infof("用户登录成功-log:%s", log)
-	return reParseJson(getAns(0, "登录成功！", Name))
+	return reParseJSON(getAns(0, "登录成功！", Name))
 
 }
 
@@ -138,11 +112,11 @@ func (si *sickerInfo) msgMain() []byte {
 
 			if err != nil {
 				pnt.Errorf(waytext+"患者失败-%v-info:%s", err, log)
-				return reParseJson(getAns(0, waytext+"失败！", ""))
+				return reParseJSON(getAns(0, waytext+"失败！", ""))
 			}
 			// 如果有患者
 		} else {
-			return reParseJson(getAns(1, "患者已存在！", userid))
+			return reParseJSON(getAns(1, "患者已存在！", userid))
 		}
 	} else {
 		_, err := DB.Exec("UPDATE sicker SET name=?,age=?,gender=?,telphone=?,hospital_number=?,attandance_number=?,disease=?,know=?,writer=? WHERE userid=?",
@@ -158,12 +132,12 @@ func (si *sickerInfo) msgMain() []byte {
 			si.Userid)
 		if err != nil {
 			pnt.Errorf(waytext+"患者失败-%v-info:%s", err, log)
-			return reParseJson(getAns(0, waytext+"失败！", ""))
+			return reParseJSON(getAns(0, waytext+"失败！", ""))
 		}
 	}
 
 	pnt.Infof(waytext+"患者成功-info:%s", log)
-	return reParseJson(getAns(1, waytext+"信息成功！", userid))
+	return reParseJSON(getAns(1, waytext+"信息成功！", userid))
 
 }
 
@@ -205,12 +179,12 @@ func (ri *riskInfo) msgMain() []byte {
 
 		if err != nil {
 			pnt.Errorf(waytext+"风险评估(化疗表)失败-%v-info:%s", err, log)
-			return reParseJson(getAns(0, waytext+"失败！", ""))
+			return reParseJSON(getAns(0, waytext+"失败！", ""))
 		}
 		// 更新周期表
 		if _, err := DB.Exec("UPDATE cycle SET date=?,time=? WHERE userid=? AND cycle_seq=?", ri.Chemotherapy_date, ri.Chemotherapy_time, ri.Userid, ri.Cycle_seq); err != nil {
 			pnt.Errorf(waytext+"风险评估(周期表)失败-%v-info:%s", err, log)
-			return reParseJson(getAns(0, waytext+"失败！", ""))
+			return reParseJSON(getAns(0, waytext+"失败！", ""))
 		}
 
 		// 添加风险评估
@@ -238,7 +212,7 @@ func (ri *riskInfo) msgMain() []byte {
 
 		if err != nil {
 			pnt.Errorf(waytext+"风险评估-风险评估-失败-%v-info:%s", err, log)
-			return reParseJson(getAns(0, waytext+"失败！", ""))
+			return reParseJSON(getAns(0, waytext+"失败！", ""))
 		}
 
 		// 更新 化疗周期表
@@ -252,12 +226,12 @@ func (ri *riskInfo) msgMain() []byte {
 
 		if erra != nil {
 			pnt.Errorf(waytext+"风险评估-化疗周期失败-%v-info:%s", erra, log)
-			return reParseJson(getAns(0, waytext+"失败！", ""))
+			return reParseJSON(getAns(0, waytext+"失败！", ""))
 		}
 		// 更新 患者表
 		if _, errb := DB.Exec("UPDATE sicker SET cycle_seq=? WHERE userid=?", ri.Cycle_seq, ri.Userid); errb != nil {
 			pnt.Errorf(waytext+"风险评估-患者表失败-%v-info:%s", errb, log)
-			return reParseJson(getAns(0, waytext+"失败！", ""))
+			return reParseJSON(getAns(0, waytext+"失败！", ""))
 		}
 
 	}
@@ -267,11 +241,11 @@ func (ri *riskInfo) msgMain() []byte {
 		if _, err := DB.Exec("UPDATE cycle SET out_hospital_time=? WHERE userid=? AND cycle_seq=? AND LENGTH(out_hospital_time)=0",
 			ri.Assessment_date+" "+ri.Assessment_time, ri.Userid, ri.Cycle_seq); err != nil {
 			pnt.Errorf(waytext+"风险评估-周期表-出院判断失败-%v-info:%s", err, log)
-			return reParseJson(getAns(0, waytext+"失败！", ""))
+			return reParseJSON(getAns(0, waytext+"失败！", ""))
 		}
 	}
 	pnt.Infof(waytext+"风险评估成功-info:%s", log)
-	return reParseJson(getAns(1, waytext+"成功！", ""))
+	return reParseJSON(getAns(1, waytext+"成功！", ""))
 
 }
 
@@ -300,7 +274,7 @@ func (ni *nurseInfo) msgMain() []byte {
 
 	if err != nil {
 		pnt.Errorf("插入护理评估-护理表-失败-%s-info:%s", err, log)
-		return reParseJson(getAns(0, "更新失败！", ""))
+		return reParseJSON(getAns(0, "更新失败！", ""))
 
 	}
 
@@ -310,12 +284,12 @@ func (ni *nurseInfo) msgMain() []byte {
 			ni.Assessment_date+" "+ni.Assessment_time, ni.Userid)
 		if err != nil {
 			pnt.Errorf("插入护理评估-更新化疗周期-失败-%s-info:%s\n", err, log)
-			return reParseJson(getAns(0, "更新失败！", ""))
+			return reParseJSON(getAns(0, "更新失败！", ""))
 		}
-		return reParseJson(getAns(1, "更新成功！该患者将进行随访！", ""))
+		return reParseJSON(getAns(1, "更新成功！该患者将进行随访！", ""))
 
 	}
-	return reParseJson(getAns(1, "更新成功！", ""))
+	return reParseJSON(getAns(1, "更新成功！", ""))
 
 }
 
@@ -349,16 +323,16 @@ func (fi *followInfo) msgMain() []byte {
 
 	if err != nil {
 		pnt.Errorf("添加随访-随访表失败-%v-log:%s", err, log)
-		return reParseJson(getAns(0, "添加失败！", ""))
+		return reParseJSON(getAns(0, "添加失败！", ""))
 	}
 	if fi.Follow_over == "1" {
 		if _, err := DB.Exec("UPDATE cycle SET follow_over=? WHERE userid=? AND cycle_seq=?", "1", fi.Userid, fi.Cycle_seq); err != nil {
 			pnt.Errorf("添加随访-周期表-失败-%v-log:%s", err, log)
-			return reParseJson(getAns(0, "添加失败！", ""))
+			return reParseJSON(getAns(0, "添加失败！", ""))
 		}
 	}
 	pnt.Errorf("随访添加成功-log:%s", log)
-	return reParseJson(getAns(1, "添加成功！", ""))
+	return reParseJSON(getAns(1, "添加成功！", ""))
 
 }
 
@@ -535,17 +509,17 @@ func (ss *searchSicker) msgMain() []byte {
 			}
 		}
 	default:
-		return reParseJson(getAns(1, "暂不支持该类型的搜索方式！", ""))
+		return reParseJSON(getAns(1, "暂不支持该类型的搜索方式！", ""))
 
 	}
 
 	if gloerr != nil {
 		pnt.Error(gloerr)
-		return reParseJson(getAns(1, "搜索失败！", ""))
+		return reParseJSON(getAns(1, "搜索失败！", ""))
 	}
 
 	res.Status = 1
-	return reParseJson(res)
+	return reParseJSON(res)
 
 }
 
@@ -559,10 +533,10 @@ func (sds *searchDeatilSick) msgMain() []byte {
 	if err != nil {
 		pnt.Infof("搜索患者详细信息-患者ID:%s-搜索失败,%v", sds.Userid, err)
 
-		return reParseJson(getAns(1, "搜索失败！", ""))
+		return reParseJSON(getAns(1, "搜索失败！", ""))
 	}
 	sdsr.Status = 1
-	return reParseJson(sdsr)
+	return reParseJSON(sdsr)
 }
 
 // 搜索 患者 化疗周期
@@ -576,12 +550,12 @@ func (ci *cycleInfo) msgMain() []byte {
 
 	if err == sql.ErrNoRows {
 		cir.Status = 1
-		return reParseJson(cir)
+		return reParseJSON(cir)
 
 	} else if err != nil {
 		pnt.Infof("搜索患者化疗周期-患者ID:%s,%v", ci.Userid, err)
 		cir.Status = 0
-		return reParseJson(cir)
+		return reParseJSON(cir)
 	}
 	defer rows.Close()
 
@@ -592,7 +566,7 @@ func (ci *cycleInfo) msgMain() []byte {
 		c++
 	}
 	cir.Status = 1
-	return reParseJson(cir)
+	return reParseJSON(cir)
 }
 
 // 查询 风险评估
@@ -609,7 +583,7 @@ func (rirc *riskInfoRec) msgMain() []byte {
 			rirc.Userid, rirc.Cycle_seq-1).Scan(
 			&rirs.Last_risk_grand); err != nil && err != sql.ErrNoRows {
 			pnt.Errorf("查询上次风险等级记录失败-%v", err)
-			return reParseJson(getAns(0, "查询上一周期内容失败！", ""))
+			return reParseJSON(getAns(0, "查询上一周期内容失败！", ""))
 		}
 
 		// 查询上次护理呕吐和恶心
@@ -619,7 +593,7 @@ func (rirc *riskInfoRec) msgMain() []byte {
 			&rirs.Last_nurse_nausea,
 			&last_seq); err != nil && err != sql.ErrNoRows {
 			pnt.Errorf("查询上次护理记录失败-%v", err)
-			return reParseJson(getAns(0, "查询上一周期内容失败！", ""))
+			return reParseJSON(getAns(0, "查询上一周期内容失败！", ""))
 		}
 
 		// 查询上次随访呕吐和恶心
@@ -656,10 +630,10 @@ func (rirc *riskInfoRec) msgMain() []byte {
 		&rirs.Chemotherapy_timestamp)
 	if err != nil {
 		pnt.Error(err)
-		return reParseJson(getAns(0, "查询失败！", ""))
+		return reParseJSON(getAns(0, "查询失败！", ""))
 	}
 	rirs.Status = 1
-	return reParseJson(rirs)
+	return reParseJSON(rirs)
 }
 
 // 查询 患者 护理具体信息
@@ -683,10 +657,10 @@ func (nirc *nurseInfoRec) msgMain() []byte {
 		&nirs.Assessment_time,
 		&nirs.Assessment_timestamp)
 	if err != nil {
-		return reParseJson(getAns(0, "查询失败！", ""))
+		return reParseJSON(getAns(0, "查询失败！", ""))
 	}
 	nirs.Status = 1
-	return reParseJson(nirs)
+	return reParseJSON(nirs)
 
 }
 
@@ -699,14 +673,14 @@ func (ntrc *nurseTableRec) msgMain() []byte {
 	rows, err := DB.Query("SELECT nurse_seq,assessment_date,assessment_time FROM nurse WHERE userid=? AND cycle_seq=?", ntrc.Userid, ntrc.Cycle_seq)
 	if err != nil {
 		pnt.Error(err)
-		return reParseJson(getAns(0, "查询失败！", ""))
+		return reParseJSON(getAns(0, "查询失败！", ""))
 	}
 	defer rows.Close()
 	for rows.Next() {
 		err := rows.Scan(&ntrs.N[i].Nurse_seq, &d, &t)
 		if err != nil {
 			pnt.Error(err)
-			return reParseJson(getAns(0, "查询失败！", ""))
+			return reParseJSON(getAns(0, "查询失败！", ""))
 		}
 		ntrs.N[i].Time = d + " " + t
 		ntrs.N[i].Has = 1
@@ -716,7 +690,7 @@ func (ntrc *nurseTableRec) msgMain() []byte {
 		}
 	}
 	ntrs.Status = 1
-	return reParseJson(ntrs)
+	return reParseJSON(ntrs)
 
 }
 
@@ -729,7 +703,7 @@ func (ftrc *followTableRec) msgMain() []byte {
 	rows, err := DB.Query("SELECT follow_seq,follow_follow_date,follow_follow_time FROM follow WHERE userid=? AND cycle_seq=?", ftrc.Userid, ftrc.Cycle_seq)
 	if err != sql.ErrNoRows && err != nil {
 		pnt.Error(err)
-		return reParseJson(getAns(0, "查询失败！", ""))
+		return reParseJSON(getAns(0, "查询失败！", ""))
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -737,7 +711,7 @@ func (ftrc *followTableRec) msgMain() []byte {
 		err := rows.Scan(&ftrs.N[i].Follow_seq, &d, &t)
 		if err != nil {
 			pnt.Error(err)
-			return reParseJson(getAns(0, "查询失败！", ""))
+			return reParseJSON(getAns(0, "查询失败！", ""))
 		}
 		ftrs.N[i].Has = 1
 		ftrs.N[i].Time = d + " " + t
@@ -749,7 +723,7 @@ func (ftrc *followTableRec) msgMain() []byte {
 	}
 
 	ftrs.Status = 1
-	return reParseJson(ftrs)
+	return reParseJSON(ftrs)
 
 }
 
@@ -780,10 +754,10 @@ func (fcrc *followContentRec) msgMain() []byte {
 
 	if err != nil {
 		pnt.Error(err)
-		return reParseJson(getAns(0, "查询失败！", ""))
+		return reParseJSON(getAns(0, "查询失败！", ""))
 	}
 	fcrs.Status = 1
-	return reParseJson(fcrs)
+	return reParseJSON(fcrs)
 }
 
 // 查询 患者 是否出院
@@ -792,14 +766,14 @@ func (ohpc *outHospitalRec) msgMain() []byte {
 	pnt.Search("查询是否出院-患者ID:%s", ohpc.Userid)
 	err := DB.QueryRow(`SELECT out_hospital_time FROM cycle WHERE cycle_seq=? AND userid=?`, ohpc.Cycle_seq, ohpc.Userid).Scan(&ohps.Time)
 	if err == sql.ErrNoRows || ohps.Time == "" {
-		return reParseJson(getAns(1, "未出院！", ""))
+		return reParseJSON(getAns(1, "未出院！", ""))
 	} else if err != sql.ErrNoRows && err != nil {
 		pnt.Error(err)
-		return reParseJson(getAns(0, "查询失败！", ""))
+		return reParseJSON(getAns(0, "查询失败！", ""))
 	}
 
 	ohps.Status = 1
-	return reParseJson(ohps)
+	return reParseJSON(ohps)
 }
 
 // 查询 今日随访
@@ -817,11 +791,11 @@ func (wgrc *waitGoRec) msgMain() []byte {
 	if err == sql.ErrNoRows {
 		wgrs.Status = 2
 		wgrs.Explain = "今日无随访患者！"
-		return reParseJson(wgrs)
+		return reParseJSON(wgrs)
 	}
 	if err != nil {
 		pnt.Errorf("%s-查询化疗表失败-%v", log, err)
-		return reParseJson(getAns(0, "查询失败！", ""))
+		return reParseJSON(getAns(0, "查询失败！", ""))
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -830,7 +804,7 @@ func (wgrc *waitGoRec) msgMain() []byte {
 		err := rows.Scan(&userid, &name, &cycle_seq)
 		if err != nil {
 			pnt.Errorf("%s-扫描化疗表失败-%v", log, err)
-			return reParseJson(getAns(0, "查询失败！", ""))
+			return reParseJSON(getAns(0, "查询失败！", ""))
 		}
 		pnt.Search("%s 已出院但随访未结束 姓名:%s ID:%s", log, name, userid)
 
@@ -852,11 +826,11 @@ func (wgrc *waitGoRec) msgMain() []byte {
 				continue
 			}
 			pnt.Errorf("%s-查询随访表-%v", log, err)
-			return reParseJson(getAns(0, "查询失败！", ""))
+			return reParseJSON(getAns(0, "查询失败！", ""))
 		}
 		continue
 	}
-	return reParseJson(wgrs)
+	return reParseJSON(wgrs)
 
 }
 
@@ -867,14 +841,14 @@ func (hrrc *heightRiskRec) msgMain() []byte {
 
 	err := DB.QueryRow("SELECT grand FROM risk WHERE userid=? AND cycle_seq=?", hrrc.Userid, hrrc.Cycle_seq).Scan(&hrrs.Height)
 	if err == sql.ErrNoRows {
-		return reParseJson(getAns(2, "风险评估的风险等级未填写", ""))
+		return reParseJSON(getAns(2, "风险评估的风险等级未填写", ""))
 	} else if err != sql.ErrNoRows && err != nil {
 		pnt.Errorf("%s-%v", log, err)
-		return reParseJson(getAns(0, "查询失败！", ""))
+		return reParseJSON(getAns(0, "查询失败！", ""))
 	}
 
 	hrrs.Status = 1
-	return reParseJson(hrrs)
+	return reParseJSON(hrrs)
 
 }
 
@@ -886,7 +860,7 @@ func (clrc *cycleLastRec) msgMain() []byte {
 
 	// 至少是第二周期开始查询上次记录
 	if clrc.Cycle_seq < 1 {
-		reParseJson(getAns(0, "查询上一周期内容失败！", ""))
+		reParseJSON(getAns(0, "查询上一周期内容失败！", ""))
 	}
 
 	// 查询上次风险等级
@@ -894,7 +868,7 @@ func (clrc *cycleLastRec) msgMain() []byte {
 		clrc.Userid, clrc.Cycle_seq-1).Scan(
 		&clrs.Last_risk_grand); err != nil && err != sql.ErrNoRows {
 		pnt.Errorf("%s-查询风险表-%v", log, err)
-		return reParseJson(getAns(0, "查询上一周期内容失败！", ""))
+		return reParseJSON(getAns(0, "查询上一周期内容失败！", ""))
 	}
 
 	// 查询上次护理呕吐和恶心
@@ -909,7 +883,7 @@ func (clrc *cycleLastRec) msgMain() []byte {
 
 		} else {
 			pnt.Errorf("%s-查询护理表-%v", log, err)
-			return reParseJson(getAns(0, "查询上一周期内容失败！", ""))
+			return reParseJSON(getAns(0, "查询上一周期内容失败！", ""))
 		}
 	}
 
@@ -923,12 +897,12 @@ func (clrc *cycleLastRec) msgMain() []byte {
 			clrs.Last_follow_nausea = ""
 		} else {
 			pnt.Errorf("%s-查询随访表-%v", log, err)
-			return reParseJson(getAns(0, "查询上一周期内容失败！", ""))
+			return reParseJSON(getAns(0, "查询上一周期内容失败！", ""))
 		}
 	}
 
 	clrs.Status = 1
-	return reParseJson(clrs)
+	return reParseJSON(clrs)
 
 }
 
@@ -943,18 +917,18 @@ func (tonrc *toNurseRec) msgMain() []byte {
 	rows, err := DB.Query("SELECT userid,cycle_seq,name FROM cycle where LENGTH(out_hospital_time)=0 and follow_over=?", 2)
 	if err != nil {
 		pnt.Errorf("%s(化疗表)-%v", log, err)
-		return reParseJson(getAns(0, "查询失败！", ""))
+		return reParseJSON(getAns(0, "查询失败！", ""))
 	}
 	defer rows.Close()
 	for rows.Next() {
 		if err != nil {
 			pnt.Errorf("%s(化疗表)-%v", log, err)
-			return reParseJson(getAns(0, "查询失败！", ""))
+			return reParseJSON(getAns(0, "查询失败！", ""))
 		}
 		err := rows.Scan(&wgrs.N[i].Userid, &wgrs.N[i].Cycle_seq, &wgrs.N[i].Name)
 		if err != nil {
 			pnt.Errorf("%s(化疗表扫描)-%v", log, err)
-			return reParseJson(getAns(0, "查询失败！", ""))
+			return reParseJSON(getAns(0, "查询失败！", ""))
 		}
 		var t string
 		pnt.Infof("%s 护理、随访未结束 姓名:%s ID:%s", log, wgrs.N[i].Name, wgrs.N[i].Userid)
@@ -974,11 +948,11 @@ func (tonrc *toNurseRec) msgMain() []byte {
 				i++
 			} else if terr != nil {
 				pnt.Errorf("%s(护理表扫描)-%v", log, err)
-				return reParseJson(getAns(0, "查询失败！", ""))
+				return reParseJSON(getAns(0, "查询失败！", ""))
 			}
 		} else if derr != sql.ErrNoRows && derr != nil {
 			pnt.Errorf("%s(风险表扫描)-%v", log, err)
-			return reParseJson(getAns(0, "查询失败！", ""))
+			return reParseJSON(getAns(0, "查询失败！", ""))
 		}
 		// 超过十五个自动结束
 		if i == 15 {
@@ -988,11 +962,11 @@ func (tonrc *toNurseRec) msgMain() []byte {
 	}
 
 	if i == 0 {
-		return reParseJson(getAns(2, "今日无护理患者", ""))
+		return reParseJSON(getAns(2, "今日无护理患者", ""))
 	}
 
 	wgrs.Status = 1
-	return reParseJson(wgrs)
+	return reParseJSON(wgrs)
 }
 
 // 查询 第一周期非药物因素
@@ -1003,8 +977,8 @@ func (lnmrc *lastnotmedicationRec) msgMain() []byte {
 	err := DB.QueryRow("SELECT not_medication FROM risk WHERE userid=? AND cycle_seq=?", lnmrc.Userid, 1).Scan(&lnmrs.Not_medication)
 	if err != nil {
 		pnt.Errorf("%s(搜索化疗表失败)-%v", log, err)
-		return reParseJson(getAns(0, "查询失败！", ""))
+		return reParseJSON(getAns(0, "查询失败！", ""))
 	}
 	lnmrs.Status = 1
-	return reParseJson(lnmrs)
+	return reParseJSON(lnmrs)
 }
