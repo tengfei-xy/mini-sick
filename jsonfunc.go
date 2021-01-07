@@ -529,7 +529,7 @@ func (sds *searchDeatilSick) msgMain() []byte {
 
 	var sdsr searchDeatilSickRes
 	err := DB.QueryRow("SELECT name,age,gender,telphone,hospital_number,attandance_number,disease,know FROM sicker WHERE userid=?",
-		sds.Userid).Scan(&sdsr.Name, &sdsr.Age, &sdsr.Gender, &sdsr.Telphone, &sdsr.Hospital_number, &sdsr.Attandance_number, &sdsr.Know, &sdsr.Disease)
+		sds.Userid).Scan(&sdsr.Name, &sdsr.Age, &sdsr.Gender, &sdsr.Telphone, &sdsr.Hospital_number, &sdsr.Attandance_number, &sdsr.Disease, &sdsr.Know)
 	if err != nil {
 		pnt.Infof("搜索患者详细信息-患者ID:%s-搜索失败,%v", sds.Userid, err)
 

@@ -27,10 +27,8 @@ func mainInitEnv() (string, string) {
 	// 用于分开指定，比如测试实例为8000端口，而数据库连接到001
 	if *db == "" {
 		db = podid
-		pnt.Init(fmt.Sprintf("PodID:%s,Start!", *podid))
-	} else {
-		pnt.Init(fmt.Sprintf("DB:%s,Port:%s,Start!", *db, *podid))
 	}
+	pnt.Init(fmt.Sprintf("PodID:%s,Start!", *podid))
 
 	return *podid, *db
 }
@@ -53,7 +51,7 @@ func mainInitMySQL(dbname string) *sql.DB {
 	if err = db.Ping(); err != nil {
 		panic(err)
 	}
-	pnt.Init("MySQL connection successful")
+	pnt.Infof("MySQL:%s connection successful!", dbname)
 
 	return db
 }
