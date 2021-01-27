@@ -126,8 +126,33 @@ func msgMain(msg []byte) []byte {
 		parseJSON(&msg, &lnmrc)
 		return lnmrc.msgMain()
 
+	// ID:5 搜索 患者填写的表
+	case Act_Search_Sicker_Write_Info:
+		var sswic seaSickerWriteInfoRec
+		parseJSON(&msg, &sswic)
+		return sswic.msgMain()
+
+	// ID:5 提交 患者填写的表
+	case Act_Submit_Sicker_Write_Info:
+		var swrirs subSickerWriteInfoRec
+		parseJSON(&msg, &swrirs)
+		return swrirs.msgMain()
+
+	// ID:5 查询 今日患者情况
+	case Act_Search_Today_Sicker:
+		var tosrc toSickerRec
+		parseJSON(&msg, &tosrc)
+		return tosrc.msgMain()
+
+	// 查看明日护理和随访数量
+	case Act_Cat_Nurse_Follow_Count:
+		var catnfcrc catNFCRec
+		parseJSON(&msg, &catnfcrc)
+		return catnfcrc.msgMain()
+
+	// 默认
 	default:
-		pnt.Info(msgtype)
+		return nil
 
 	}
 	return nil

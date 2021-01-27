@@ -19,18 +19,18 @@ var podID string
 var DB *sql.DB
 
 func mainInitEnv() (string, string) {
-	podid := flag.String("id", "000", "请指定ID,默认:000")
-	db := flag.String("db", "", "请指定数据库,默认为ID值")
+	port := flag.String("port", "000", "请指定外部端口,百位数0为生产环境,1为测试环境,默认:000")
+	db := flag.String("db", "000", "请指定数据库,默认为ID值")
 	flag.Parse()
 
-	// 如果数据库未指定，则使用podid指定
+	// 如果数据库未指定，则使用port指定
 	// 用于分开指定，比如测试实例为8000端口，而数据库连接到001
 	if *db == "" {
-		db = podid
+		db = port
 	}
-	pnt.Init(fmt.Sprintf("PodID:%s,Start!", *podid))
+	pnt.Init(fmt.Sprintf("Port:%s,Start!", *port))
 
-	return *podid, *db
+	return *port, *db
 }
 
 func mainInitMySQL(dbname string) *sql.DB {

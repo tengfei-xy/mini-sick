@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS `sicker`(
    `hospital_number` VARCHAR(12),
    `attandance_number` VARCHAR(12),
    `disease` VARCHAR(20) ,
-   `know` char(11) DEFAULT '',
+   `know` char(11) DEFAULT '0',
    `cycle_seq` INT DEFAULT '0',
    `writer` VARCHAR(10) NOT NULL,
    `write_data`DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -48,6 +48,7 @@ type userInfo struct {
 	Account  string `json:"account"`
 	Name     string `json:"name"`
 	Password string `json:"password"`
+	Who      string `json:"who"`
 }
 
 // 风险评估表
@@ -208,6 +209,10 @@ type ans struct {
 	Explain string `json:"explain"`
 	Data    string `json:"data"`
 }
+type baseinfo struct {
+	Userid    string `json:"userid"`
+	Cycle_seq int    `json:"cycle_seq"`
+}
 type cycleInfo struct {
 	Action string `json:"Action"`
 	Userid string `json:"userid"`
@@ -217,10 +222,9 @@ type cycleInfoRes struct {
 	S [15]cycleInfoResS `json:"data"`
 }
 type cycleInfoResS struct {
-	Userid    string `json:"userid"`
-	Cycle_seq int    `json:"cycle_seq"`
-	Anstime   string `json:"time"`
-	Has       int    `json:"has"`
+	baseinfo
+	Anstime string `json:"time"`
+	Has     int    `json:"has"`
 }
 type searchSicker struct {
 	Name              string `json:"name"`
@@ -250,15 +254,13 @@ type searchDeatilSickRes struct {
 }
 
 type riskInfoRec struct {
-	Action    string `json:"action"`
-	Userid    string `json:"userid"`
-	Cycle_seq int    `json:"cycle_seq"`
+	Action string `json:"action"`
+	baseinfo
 }
 type riskInfoRes struct {
 	ans
 
-	Userid    string `json:"userid"`
-	Cycle_seq int    `json:"cycle_seq"`
+	baseinfo
 
 	Program         string `json:"program"`
 	Not_medication  string `json:"not_medication"`
@@ -285,9 +287,8 @@ type riskInfoRes struct {
 	Chemotherapy_timestamp string `json:"chemotherapy_timestamp"`
 }
 type nurseTableRec struct {
-	Action    string `json:"action"`
-	Userid    string `json:"userid"`
-	Cycle_seq int    `json:"cycle_seq"`
+	Action string `json:"action"`
+	baseinfo
 }
 type nurseTable struct {
 	Nurse_seq int    `json:"nurse_seq"`
@@ -299,17 +300,15 @@ type nurseTableReS struct {
 	N [15]nurseTable
 }
 type nurseInfoRec struct {
-	Action    string `json:"action"`
-	Userid    string `json:"userid"`
-	Cycle_seq int    `json:"cycle_seq"`
-	Nurse_seq int    `json:"nurse_seq"`
+	Action string `json:"action"`
+	baseinfo
+	Nurse_seq int `json:"nurse_seq"`
 }
 type nurseInfoRes struct {
 	ans
-	Userid    string `json:"userid"`
-	Cycle_seq int    `json:"cycle_seq"`
-	Nurse_seq int    `json:"nurse_seq"`
+	baseinfo
 
+	Nurse_seq         string `json:"nurse_seq"`
 	Nausea_assessment string `json:"nausea_assessment"`
 	Emesis_assessment string `json:"emesis_assessment"`
 	Measure           string `json:"measure"`
@@ -323,9 +322,8 @@ type nurseInfoRes struct {
 }
 
 type outHospitalRec struct {
-	Action    string `json:"action"`
-	Userid    string `json:"userid"`
-	Cycle_seq int    `json:"cycle_seq"`
+	Action string `json:"action"`
+	baseinfo
 }
 type outHospitalRes struct {
 	ans
@@ -338,25 +336,22 @@ type followTable struct {
 	Has        int    `json:"has"`
 }
 type followTableRec struct {
-	Action    string `json:"action"`
-	Userid    string `json:"userid"`
-	Cycle_seq int    `json:"cycle_seq"`
+	Action string `json:"action"`
+	baseinfo
 }
 type followTableRes struct {
 	ans
 	N [15]followTable
 }
 type followContentRec struct {
-	Action     string `json:"action"`
-	Userid     string `json:"userid"`
-	Cycle_seq  int    `json:"cycle_seq"`
-	Follow_seq int    `json:"follow_seq"`
+	Action string `json:"action"`
+	baseinfo
+	Follow_seq int `json:"follow_seq"`
 }
 type followContentRes struct {
 	ans
+	baseinfo
 
-	Userid                  string `json:"userid"`
-	Cycle_seq               int    `json:"cycle_seq"`
 	Follow_seq              int    `json:"follow_seq"`
 	Hight_risk              string `json:"hight_risk"`
 	Emesis_grade            string `json:"emesis_grade"`
@@ -376,10 +371,9 @@ type followContentRes struct {
 	Follow_follow_timestamp string `json:"follow_follow_timestamp"`
 }
 type waitGo struct {
-	Name      string `json:"name"`
-	Userid    string `json:"userid"`
-	Cycle_seq int    `json:"cycle_seq"`
-	Has       int    `json:"has"`
+	baseinfo
+	Name string `json:"name"`
+	Has  int    `json:"has"`
 }
 type waitGoRec struct {
 	Action string `json:"action"`
@@ -389,18 +383,16 @@ type waitGoRes struct {
 	N [15]waitGo
 }
 type heightRiskRec struct {
-	Action    string `json:"action"`
-	Userid    string `json:"userid"`
-	Cycle_seq int    `json:"cycle_seq"`
+	Action string `json:"action"`
+	baseinfo
 }
 type heightRiskReS struct {
 	ans
 	Height int `json:"height"`
 }
 type cycleLastRec struct {
-	Action    string `json:"action"`
-	Userid    string `json:"userid"`
-	Cycle_seq int    `json:"cycle_seq"`
+	Action string `json:"action"`
+	baseinfo
 }
 type cycleLastRes struct {
 	ans
@@ -412,10 +404,9 @@ type cycleLastRes struct {
 }
 
 type toNurse struct {
-	Name      string `json:"name"`
-	Userid    string `json:"userid"`
-	Cycle_seq int    `json:"cycle_seq"`
-	Has       int    `json:"has"`
+	baseinfo
+	Name string `json:"name"`
+	Has  int    `json:"has"`
 }
 type toNurseRec struct {
 	Action string `json:"action"`
@@ -428,7 +419,73 @@ type lastnotmedicationRec struct {
 	Action string `json:"action"`
 	Userid string `json:"userid"`
 }
-type lastnotmedicationReS struct {
+type lastnotmedicationRes struct {
 	ans
 	Not_medication string `json:"not_medication"`
+}
+
+// ID:5 start
+type userLoginRes struct {
+	ans
+	baseinfo
+}
+type seaSickerWriteInfoRec struct {
+	Action string `json:"action"`
+	baseinfo
+}
+type seaSickerWriteInfoRes struct {
+	ans
+	Nausea_assessment string `json:"nausea_assessment"`
+	Emesis_assessment string `json:"emesis_assessment"`
+	Measure           string `json:"measure"`
+	Satisfaction_1    string `json:"satisfaction_1"`
+	Satisfaction_2    string `json:"satisfaction_2"`
+	Satisfaction_3    string `json:"satisfaction_3"`
+	Satisfaction_4    string `json:"satisfaction_4"`
+	Satisfaction_5    string `json:"satisfaction_5"`
+}
+type subSickerWriteInfoRec struct {
+	Action string `json:"action"`
+	baseinfo
+
+	Updated            int    `json:"updated"`
+	Nausea_assessment  string `json:"nausea_assessment"`
+	Emesis_assessment  string `json:"emesis_assessment"`
+	Measure            string `json:"measure"`
+	Satisfaction_1     string `json:"satisfaction_1"`
+	Satisfaction_2     string `json:"satisfaction_2"`
+	Satisfaction_3     string `json:"satisfaction_3"`
+	Satisfaction_4     string `json:"satisfaction_4"`
+	Satisfaction_5     string `json:"satisfaction_5"`
+	Satisfaction_total string `json:"satisfaction_total"`
+}
+type subSickerWriteInfoRes struct {
+	ans
+}
+type toSickerRec struct {
+	Action string `json:"action"`
+}
+type toSickerRes struct {
+	ans
+	N [50]toSickerInfo
+}
+type toSickerInfo struct {
+	baseinfo
+	Name              string `json:"name"`
+	Nurse_seq         int    `json:"nurse_seq"`
+	Nausea_assessment string `json:"nausea_assessment"`
+	Emesis_assessment string `json:"emesis_assessment"`
+
+	Has int `json:"has"`
+}
+
+// ID:5 start over
+
+type catNFCRec struct {
+	Action string `json:"action"`
+}
+type catNFCRes struct {
+	ans
+	FollowCount int `json:"followcount"`
+	NurseCount  int `json:"nursecount"`
 }

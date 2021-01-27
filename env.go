@@ -1,6 +1,5 @@
 package main
 
-//-----------
 const Act_Add_Sick string = "add-sick---"
 const Act_Add_Risk string = "add-risk---"
 const Act_Add_Nurse string = "add-nurse--"
@@ -20,3 +19,11 @@ const Act_Search_Height_Risk string = "-seq-h-risk"
 const Act_Req_Cylce_Last string = "req-cycle-l"
 const Act_Search_Today_Nurse string = "sea-to-nurs"
 const Act_Req_Last_Not_Medication string = "sea-lnot-me"
+const Act_Cat_Nurse_Follow_Count string = "cat-nf-coun"
+
+// ID:5 start
+const Act_Search_Sicker_Write_Info string = "sea-sic-wri"
+const Act_Submit_Sicker_Write_Info string = "sub-sic-wri"
+const Act_Search_Today_Sicker string = "sea-to-sick"
+
+// ID:5 over
