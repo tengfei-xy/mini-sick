@@ -203,6 +203,27 @@ type followInfo struct {
 PRIMARY KEY ( `userid`,`cycle_seq` )
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 */
+// 数据下载
+/*
+ CREATE TABLE IF NOT EXISTS `download`(
+   `id` INT NOT NULL AUTO_INCREMENT,
+   `writer` VARCHAR(10) NOT NULL,
+   `start` CHAR(10) NOT NULL,
+   `end` CHAR(10) NOT NULL,
+   `submit` CHAR(10) NOT NULL,
+   `status` tinyint NOT NULL,
+ PRIMARY KEY ( `id` )
+ )ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
+*/
+type downloadInfo struct {
+	ID     int64  `json:"id"`
+	Writer string `json:"writer"`
+	Start  string `json:"start"`
+	End    string `json:"end"`
+	Submit string `json:"submit"`
+	Status int    `json:"status"`
+}
+
 // 小程序应答结构体
 type ans struct {
 	Status  int    `json:"status"`
@@ -219,7 +240,7 @@ type cycleInfo struct {
 }
 type cycleInfoRes struct {
 	ans
-	S [15]cycleInfoResS `json:"data"`
+	S [50]cycleInfoResS `json:"data"`
 }
 type cycleInfoResS struct {
 	baseinfo
@@ -235,7 +256,7 @@ type searchSicker struct {
 }
 type searchSickerRes struct {
 	ans
-	S [15]searchSicker `json:"data"`
+	S [50]searchSicker `json:"data"`
 }
 type searchDeatilSick struct {
 	Action string `json:"action"`
@@ -297,7 +318,7 @@ type nurseTable struct {
 }
 type nurseTableReS struct {
 	ans
-	N [15]nurseTable
+	N [50]nurseTable
 }
 type nurseInfoRec struct {
 	Action string `json:"action"`
@@ -341,7 +362,7 @@ type followTableRec struct {
 }
 type followTableRes struct {
 	ans
-	N [15]followTable
+	N [50]followTable
 }
 type followContentRec struct {
 	Action string `json:"action"`
@@ -380,7 +401,7 @@ type waitGoRec struct {
 }
 type waitGoRes struct {
 	ans
-	N [15]waitGo
+	N [50]waitGo
 }
 type heightRiskRec struct {
 	Action string `json:"action"`
@@ -413,7 +434,7 @@ type toNurseRec struct {
 }
 type toNurseRes struct {
 	ans
-	N [15]toNurse
+	N [50]toNurse
 }
 type lastnotmedicationRec struct {
 	Action string `json:"action"`
@@ -488,4 +509,25 @@ type catNFCRes struct {
 	ans
 	FollowCount int `json:"followcount"`
 	NurseCount  int `json:"nursecount"`
+}
+type downloadSubmitRec struct {
+	Action string `json:"action"`
+	downloadInfo
+}
+type downloadSubmitRes struct {
+	ans
+}
+type downloadSearchRec struct {
+	Action string `json:"action"`
+}
+type downloadSearchRes struct {
+	ans
+	N [50]downloadInfo
+}
+type downloadTryRec struct {
+	Action string `json:"action"`
+	ID     int64  `json:"id"`
+}
+type downloadTryRes struct {
+	ans
 }

@@ -3,8 +3,10 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io"
 	"math/rand"
+	"os"
 	"time"
 
 	// my lib
@@ -42,4 +44,16 @@ func reParseJSON(v interface{}) []byte {
 		pnt.Errorwd(v, err)
 	}
 	return textbyte
+}
+
+func notExistFile(fn string) bool {
+	_, err := os.Stat(fn)
+	return errors.Is(err, os.ErrNotExist)
+}
+func existFile(fn string) bool {
+	_, err := os.Stat(fn)
+	if err == nil {
+		return true
+	}
+	return errors.Is(err, os.ErrExist)
 }

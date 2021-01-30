@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 
 	_ "github.com/go-sql-driver/mysql"
 
@@ -14,23 +15,17 @@ import (
 	pnt "print"
 )
 
-var port string
-var podID string
+var PodID int
 var DB *sql.DB
 
 func mainInitEnv() (string, string) {
-	port := flag.String("port", "000", "请指定外部端口,百位数0为生产环境,1为测试环境,默认:000")
-	db := flag.String("db", "000", "请指定数据库,默认为ID值")
+	pPort := flag.String("port", "000", "请指定外部端口,百位数0为生产环境,1为测试环境,默认:000")
+	pDB := flag.String("db", "000", "请指定数据库,默认为ID值")
 	flag.Parse()
 
-	// 如果数据库未指定，则使用port指定
-	// 用于分开指定，比如测试实例为8000端口，而数据库连接到001
-	if *db == "" {
-		db = port
-	}
-	pnt.Init(fmt.Sprintf("Port:%s,Start!", *port))
-
-	return *port, *db
+	pnt.Init(fmt.Sprintf("Port:%s,DB:%s,Start!", *pPort, *pDB))
+	PodID, _ = strconv.Atoi(*pDB)
+	return *pPort, *pDB
 }
 
 func mainInitMySQL(dbname string) *sql.DB {
@@ -51,7 +46,7 @@ func mainInitMySQL(dbname string) *sql.DB {
 	if err = db.Ping(); err != nil {
 		panic(err)
 	}
-	pnt.Infof("MySQL:%s connection successful!", dbname)
+	pnt.Init("MySQL connection successful")
 
 	return db
 }

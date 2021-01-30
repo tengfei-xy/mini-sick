@@ -6,6 +6,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 
+	"env"
 	pnt "print"
 )
 
@@ -47,6 +48,7 @@ func (ui *userInfo) msgMain() []byte {
 				pnt.Errorf("登录错误-%v-info:%s", err, log)
 				return reParseJSON(getAns(1, "登录错误！", ""))
 			}
+			ulrs.Data = Name
 
 			// 姓名登录方式
 		} else if ui.Name != "" {
@@ -56,6 +58,8 @@ func (ui *userInfo) msgMain() []byte {
 				pnt.Errorf("登录错误-%v-info:%s", err, log)
 				return reParseJSON(getAns(1, "登录错误！", ""))
 			}
+			ulrs.Data = ui.Name
+
 		}
 
 		// 输入密码 与 数据库查询密码 不匹配
@@ -75,12 +79,12 @@ func (ui *userInfo) msgMain() []byte {
 			return reParseJSON(getAns(1, "登录错误！", ""))
 		}
 		pnt.Infof("登录成功-log:%s", log)
+		ulrs.Data = ui.Name
 
 	}
 
 	ulrs.Explain = "登录成功！"
 	ulrs.Status = 0
-	ulrs.Data = ui.Name
 	return reParseJSON(ulrs)
 }
 
@@ -358,6 +362,9 @@ func (ss *searchSicker) msgMain() []byte {
 	h := ss.Hospital_number
 	a := ss.Attandance_number
 	var res searchSickerRes
+	var log string = fmt.Sprintf("搜索患者")
+	pnt.Info(log)
+
 	t := 0
 	var c int = 0
 	var gloerr error = nil
@@ -410,7 +417,8 @@ func (ss *searchSicker) msgMain() []byte {
 			}
 			res.S[c].Has = 1
 			c++
-			if c == 15 {
+			if c == 50 {
+				pnt.Errorf("%s-扫描将超过50个", log)
 				break
 			}
 		}
@@ -428,7 +436,8 @@ func (ss *searchSicker) msgMain() []byte {
 			}
 			res.S[c].Has = 1
 			c++
-			if c == 15 {
+			if c == 50 {
+				pnt.Errorf("%s-扫描将超过50个", log)
 				break
 			}
 		}
@@ -447,7 +456,7 @@ func (ss *searchSicker) msgMain() []byte {
 			}
 			res.S[c].Has = 1
 			c++
-			if c == 15 {
+			if c == 50 {
 				break
 			}
 		}
@@ -465,7 +474,8 @@ func (ss *searchSicker) msgMain() []byte {
 			}
 			res.S[c].Has = 1
 			c++
-			if c == 15 {
+			if c == 50 {
+				pnt.Errorf("%s-扫描将超过50个", log)
 				break
 			}
 		}
@@ -484,7 +494,8 @@ func (ss *searchSicker) msgMain() []byte {
 			}
 			res.S[c].Has = 1
 			c++
-			if c == 15 {
+			if c == 50 {
+				pnt.Errorf("%s-扫描将超过50个", log)
 				break
 			}
 		}
@@ -502,7 +513,8 @@ func (ss *searchSicker) msgMain() []byte {
 			}
 			res.S[c].Has = 1
 			c++
-			if c == 15 {
+			if c == 50 {
+				pnt.Errorf("%s-扫描将超过50个", log)
 				break
 			}
 		}
@@ -520,7 +532,8 @@ func (ss *searchSicker) msgMain() []byte {
 			}
 			res.S[c].Has = 1
 			c++
-			if c == 15 {
+			if c == 50 {
+				pnt.Errorf("%s-扫描将超过50个", log)
 				break
 			}
 		}
@@ -683,7 +696,9 @@ func (ntrc *nurseTableRec) msgMain() []byte {
 	var ntrs nurseTableReS
 	var i int = 0
 	var d, t string
-	pnt.Search("查询护理表-患者ID:%s,化疗周期:%d", ntrc.Userid, ntrc.Cycle_seq)
+	var log string = fmt.Sprintf("查询护理表-患者ID:%s,化疗周期:%d", ntrc.Userid, ntrc.Cycle_seq)
+
+	pnt.Info(log)
 	rows, err := DB.Query("SELECT nurse_seq,assessment_date,assessment_time FROM nurse WHERE userid=? AND cycle_seq=?", ntrc.Userid, ntrc.Cycle_seq)
 	if err != nil {
 		pnt.Error(err)
@@ -699,7 +714,8 @@ func (ntrc *nurseTableRec) msgMain() []byte {
 		ntrs.N[i].Time = d + " " + t
 		ntrs.N[i].Has = 1
 		i++
-		if i == 15 {
+		if i == 50 {
+			pnt.Errorf("%s-扫描将超过50个", log)
 			break
 		}
 	}
@@ -710,9 +726,11 @@ func (ntrc *nurseTableRec) msgMain() []byte {
 // 查询 患者 随访表
 func (ftrc *followTableRec) msgMain() []byte {
 	var ftrs followTableRes
+	var log string = fmt.Sprintf("查询随访表-患者ID:%s", ftrc.Userid)
+
 	var i int = 0
 	var d, t string
-	pnt.Search("查询随访表-患者ID:%s", ftrc.Userid)
+	pnt.Info(log)
 	rows, err := DB.Query("SELECT follow_seq,follow_follow_date,follow_follow_time FROM follow WHERE userid=? AND cycle_seq=?", ftrc.Userid, ftrc.Cycle_seq)
 	if err != sql.ErrNoRows && err != nil {
 		pnt.Error(err)
@@ -729,7 +747,8 @@ func (ftrc *followTableRec) msgMain() []byte {
 		ftrs.N[i].Has = 1
 		ftrs.N[i].Time = d + " " + t
 		i++
-		if i == 15 {
+		if i == 50 {
+			pnt.Errorf("%s-扫描将超过50个", log)
 			break
 		}
 
@@ -799,7 +818,6 @@ func (wgrc *waitGoRec) msgMain() []byte {
 
 	// 随访条件：随访未结束、已出院
 	rows, err := DB.Query("SELECT userid,name,cycle_seq FROM cycle WHERE follow_over!=? AND TO_DAYS( NOW( ) ) - TO_DAYS( out_hospital_time) > ? ORDER BY cycle_seq", "1", 2)
-	// rows, err := DB.Query("SELECT userid,name,out_hospital_time,cycle_seq FROM cycle WHERE follow_over!=? AND LENGTH(out_hospital_time)!=? ORDER BY cycle_seq", "1", 0)
 	if err == sql.ErrNoRows {
 		wgrs.Status = 2
 		wgrs.Explain = "今日无随访患者！"
@@ -832,7 +850,8 @@ func (wgrc *waitGoRec) msgMain() []byte {
 				wgrs.Status = 1
 				i++
 
-				if i == 15 {
+				if i == 50 {
+					pnt.Errorf("%s-扫描将超过50个", log)
 					break
 				}
 				continue
@@ -960,7 +979,8 @@ func (tonrc *toNurseRec) msgMain() []byte {
 			return reParseJSON(getAns(0, "查询失败！", ""))
 		}
 		// 超过十五个自动结束
-		if i == 15 {
+		if i == 50 {
+			pnt.Errorf("%s-扫描将超过50个", log)
 			break
 		}
 
@@ -1011,7 +1031,6 @@ func (sswic *seaSickerWriteInfoRec) msgMain() []byte {
 		sswis.Status = 1
 		return reParseJSON(sswis)
 	}
-
 }
 
 // 提交 患者填写的表
@@ -1084,7 +1103,7 @@ func (tosrc *toSickerRec) msgMain() []byte {
 		tosrs.N[i].Has = 1
 		i++
 		if i == 50 {
-			pnt.Errorf("%s-扫描超过50个", log)
+			pnt.Errorf("%s-扫描将超过50个", log)
 			break
 		}
 	}
@@ -1112,4 +1131,107 @@ func (catnfcrc *catNFCRec) msgMain() []byte {
 
 	catnfcrs.Status = 0
 	return reParseJSON(catnfcrs)
+}
+
+// 数据下载-提交
+func (dsubrc *downloadSubmitRec) msgMain() []byte {
+	var dsubrs downloadSubmitRes
+	var log string = fmt.Sprintf("数据下载-提交-提交人:%s-提交时间-:%s-开始时间:%s-结束时间:%s", dsubrc.Writer, dsubrc.Submit, dsubrc.Start, dsubrc.End)
+	row, err := DB.Exec("INSERT INTO download (writer,submit,start,end,status) VALUES(?,?,?,?,?)", dsubrc.Writer, dsubrc.Submit, dsubrc.Start, dsubrc.End, 0)
+	if err != nil {
+		pnt.Errorf("%s(插入下载表)-%v", log, err)
+		return reParseJSON(getAns(0, "提交失败！", ""))
+	}
+	dsubrs.Status = 1
+	dsubrs.Explain = "提交成功！请稍后刷新查看!"
+
+	id, errid := row.LastInsertId()
+	if errid != nil {
+		pnt.Errorf("%s(LastInsertId)-%v", log, err)
+	}
+	pnt.Infof("%s-ID:%d-状态:0", log, id)
+	go downloadMain(log, dsubrc.Writer, dsubrc.Submit, dsubrc.Start, dsubrc.End, id)
+
+	return reParseJSON(dsubrs)
+}
+
+// 数据下载-搜索
+func (dsearc *downloadSearchRec) msgMain() []byte {
+	var dsears downloadSearchRes
+	var i int
+	var log string = fmt.Sprintf("数据下载-搜索")
+	rows, err := DB.Query("SELECT id,writer,start,end,submit,status FROM download ORDER BY id DESC LIMIT ?", 50)
+	if err == sql.ErrNoRows {
+		pnt.Errorf("%s(扫描下载表-空)-%v", log, err)
+		return reParseJSON(getAns(2, "", ""))
+	}
+	if err != nil && err != sql.ErrNoRows {
+		pnt.Errorf("%s(扫描下载表)-%v", log, err)
+		return reParseJSON(getAns(0, "查询失败！", ""))
+	}
+	for rows.Next() {
+		if err := rows.Scan(&dsears.N[i].ID, &dsears.N[i].Writer, &dsears.N[i].Start, &dsears.N[i].End, &dsears.N[i].Submit, &dsears.N[i].Status); err != nil {
+			return reParseJSON(getAns(0, "查询失败！", ""))
+		}
+		i++
+		if i == 50 {
+			pnt.Errorf("%s-扫描将超过50个", log)
+			break
+		}
+	}
+	dsears.Status = 1
+	return reParseJSON(dsears)
+}
+
+// 数据下载-重试
+func (dtryrc *downloadTryRec) msgMain() []byte {
+	var dtryrs downloadTryRes
+	var di downloadInfo
+	var log string = fmt.Sprintf("数据下载-重试-ID:%d", dtryrc.ID)
+	if err := DB.QueryRow("SELECT writer,start,end,submit,status FROM download WHERE id=?",
+		dtryrc.ID).Scan(&di.Writer, &di.Start, &di.End, &di.Submit, &di.Status); err != nil {
+
+		pnt.Errorf("%s(扫描下载表)-%v", log, err)
+		return reParseJSON(getAns(0, "查询失败！", ""))
+	}
+	fn := pugeFileName(di.Submit, di.Start, di.End)
+	pnt.Infof("%s-File:%s-Status:%d", log, fn, di.Status)
+
+	switch di.Status {
+	// 数据插入,未扫描
+	case 0:
+		go downloadMain(log, di.Writer, di.Submit, di.Start, di.End, dtryrc.ID)
+		dtryrs.Status = 1
+		dtryrs.Explain = "正在生成！请稍后刷新！"
+
+	// 扫描数据失败
+	case 10:
+		if notExistFile(fn) {
+			dtryrs.Status = 0
+			dtryrs.Explain = "系统错误！请稍后重试！"
+			pnt.Errorf("%s(文件不存在)", log)
+		}
+
+	// 文件传输失败
+	case 11:
+		fn = env.PathFileSave + "/" + fn
+		if existFile(fn) {
+			if err := scpMain(fn); err != nil {
+				dtryrs.Status = 0
+				dtryrs.Explain = "系统错误！请稍后重试！"
+				pnt.Errorf("%s(scp错误)-%v", log, err)
+			} else {
+				dtryrs.Status = 1
+				dtryrs.Explain = "已完成！请刷新界面！"
+				DB.Exec("UPDATE download SET status=? WHERE id=?", 9, dtryrc.ID)
+			}
+		} else {
+			dtryrs.Status = 0
+			dtryrs.Explain = "系统错误！请稍后重试！"
+			pnt.Errorf("%s(文件不存在或其他错误)", log)
+		}
+	default:
+		dtryrs.Explain = "请稍后重试！"
+	}
+	return reParseJSON(dtryrs)
 }
