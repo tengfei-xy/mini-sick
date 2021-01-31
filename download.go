@@ -177,20 +177,20 @@ func (d *data) queryName() error {
 // 查询 患者信息 适用podID:3、4
 func (d *data) querySicker34() error {
 	var i int = 2
-	var name, age, gender, telphone, borndate, disease, know string
+	var name, age, gender, telphone, hospital_number, disease, know string
 	const sheet = "患者信息表"
 	d.xls.NewSheet(sheet)
-	colCount := d.setTitle(sheet, "姓名,年龄,性别,电话,出生年月,诊断,患者是否知情")
+	colCount := d.setTitle(sheet, "姓名,年龄,性别,电话,出生年月日,诊断,患者是否知情")
 	list := make([]string, colCount)
 
-	rows, err := DB.Query("SELECT name,age,gender,telphone,borndate,disease,know FROM sicker WHERE userid IN (SELECT distinct userid FROM risk WHERE chemotherapy_date >=? AND chemotherapy_date<= ?)", d.sTime, d.eTime)
+	rows, err := DB.Query("SELECT name,age,gender,telphone,hospital_number,disease,know FROM sicker WHERE userid IN (SELECT distinct userid FROM risk WHERE chemotherapy_date >=? AND chemotherapy_date<= ?)", d.sTime, d.eTime)
 	if err != nil {
 		pnt.Errorf("%s(查询患者-查询患者表失败)-%v", d.log, err)
 		return err
 	}
 
 	for rows.Next() {
-		err := rows.Scan(&name, &age, &gender, &telphone, &borndate, &disease, &know)
+		err := rows.Scan(&name, &age, &gender, &telphone, &hospital_number, &disease, &know)
 		if err != nil {
 			pnt.Errorf("%s(查询患者-扫描失败)-%v", d.log, err)
 			return err
@@ -200,7 +200,7 @@ func (d *data) querySicker34() error {
 		list[1] = age
 		list[2] = gender
 		list[3] = telphone
-		list[4] = borndate
+		list[4] = hospital_number
 		list[5] = disease
 		list[6] = convSickerKnow(know)
 

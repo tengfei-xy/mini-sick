@@ -955,18 +955,18 @@ func (tonrc *toNurseRec) msgMain() []byte {
 			return reParseJSON(getAns(0, "查询失败！", ""))
 		}
 		var t string
-		pnt.Infof("%s 护理、随访未结束 姓名:%s ID:%s", log, wgrs.N[i].Name, wgrs.N[i].Userid)
-		// 查询这个化疗周期中 化疗时间是否大于1天
+		//pnt.Infof("%s 护理、随访未结束 姓名:%s ID:%s", log, wgrs.N[i].Name, wgrs.N[i].Userid)
 
+		// 查询这个化疗周期中 化疗时间是否大于1天
 		if derr := DB.QueryRow("SELECT chemotherapy_date FROM risk WHERE TO_DAYS(NOW())-TO_DAYS(chemotherapy_date) <? AND need_nurse=? AND userid=? AND cycle_seq=?", 1, 1, wgrs.N[i].Userid, wgrs.N[i].Cycle_seq).Scan(&t); derr == sql.ErrNoRows {
 
-			pnt.Infof("%s 化疗时间大于1天 姓名:%s ID:%s", log, wgrs.N[i].Name, wgrs.N[i].Userid)
+			//pnt.Infof("%s 化疗时间大于1天 姓名:%s ID:%s", log, wgrs.N[i].Name, wgrs.N[i].Userid)
 
 			// 查询这个化疗周期中 护理时间是不是今天
 			terr := DB.QueryRow("SELECT assessment_date FROM nurse WHERE userid=? AND to_days(assessment_date)=to_days(now()) AND cycle_seq=? ORDER BY nurse_seq DESC LIMIT ?", wgrs.N[i].Userid, wgrs.N[i].Cycle_seq, 1).Scan(&t)
 
 			if terr == sql.ErrNoRows {
-				pnt.Infof("%s 今日护理 姓名:%s ID:%s", log, wgrs.N[i].Name, wgrs.N[i].Userid)
+				//pnt.Infof("%s 今日护理 姓名:%s ID:%s", log, wgrs.N[i].Name, wgrs.N[i].Userid)
 
 				wgrs.N[i].Has = 1
 				i++
